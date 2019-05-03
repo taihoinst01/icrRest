@@ -284,7 +284,7 @@ def filteredData(apiData):
         if new_col_list:
             for newCol in new_col_list:
                 writeJson(newCol, labelFileList)
-            # label 추�? ???�습
+            # label ì¶ê? ???ìµ
             labelTrain.startTrain()
         return readFile
     except Exception as e:
@@ -316,22 +316,22 @@ def writeJson(f_data, file_path):
 
 
 def pyOcr(item):
-    # MS ocr api ? �?
+    # MS ocr api 호출
     ocrData = get_Ocr_Info(item)
 
-    # Y축정??
+    # Y축정렬
     ocrData = sortArrLocation(ocrData)
 
-    # ? ???분리 모듈 - ? �??
+    # 레이블 분리 모듈 - 임교진
     ocrData = splitLabel(ocrData)
 
-    # doctype 추출 similarity - ? �??
+    # doctype 추출 similarity - 임교진
     docTopType, docType, maxNum = findDocType(ocrData)
 
-    # Y ?? ???X ?? ???추출
+    # Y축 데이터 X축 데이터 추출
     ocrData = compareLabel(ocrData)
 
-    # label 추출 MS ML ? �?
+    # label 추출 MS ML 호출
     labelData = findColByML(ocrData)
     # entry 추출
     entryData = findColByML(ocrData)
@@ -339,7 +339,7 @@ def pyOcr(item):
     # findLabel
     #ocrData = findLabel(ocrData)
 
-    # entry 추출
+    # findEntry
     #ocrData = findEntry(ocrData)
     #print(ocrData)
     obj = {}
@@ -349,7 +349,7 @@ def pyOcr(item):
 
     return obj
 
-# pdf ? ??png 변??? ??
+# pdf 에서 png 변환 함수
 def convertPdfToImage(upload_path, pdf_file):
 
     try:
@@ -357,7 +357,7 @@ def convertPdfToImage(upload_path, pdf_file):
                                   last_page=None,
                                   fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False,
                                   transparent=False)
-        pdf_file = pdf_file[:-4]  # ? �??? ???
+        pdf_file = pdf_file[:-4]  # 업로드 파일명
         filenames = []
         for page in pages:
             filename = "%s-%d.jpg" % (pdf_file, pages.index(page))
@@ -399,10 +399,10 @@ def imgResize(filename):
                 else:
                     magnify = round((FIX_SHORT / width) - 0.005, 2)
 
-            # ?  ?, 축소
+            # 확대, 축소
             img = cv2.resize(img, dsize=(0, 0), fx=magnify, fy=magnify, interpolation=cv2.INTER_LINEAR)
             height, width = img.shape[:2]
-            # ? �?? ??
+            # 여백 생성
             if imagetype == "hori":
                 img = cv2.copyMakeBorder(img, 0, FIX_SHORT - height, 0, FIX_LONG - width, cv2.BORDER_CONSTANT,
                                          value=[255, 255, 255])
@@ -546,7 +546,7 @@ def splitLabel(ocrData):
     try:
         sepKeywordList = []
 
-        # sep_keyword ? ??추출
+        # sep_keyword ? ??ì¶ì¶
         file = open("splitLabel.txt", "r", encoding="UTF8")
         for line in file:
             sepKeyword = line.strip()
@@ -636,11 +636,11 @@ def compareLabel(inputArr):
         for data in inputArr:
             dataLoc = data["location"].split(",")
 
-            # ? ???5 ?문장 가? ???
+            # ? ???5 ?ë¬¸ì¥ ê°? ???
             if item != data and bottomCheck(itemLoc[1], dataLoc[1], 2) and locationCheck(itemLoc[0], dataLoc[0], 10, -10) and len(yData) < 5:
                 yData.append(data["text"].replace(" ", ""))
 
-            # ? 른쪽???5 ?문장 가? ???
+            # ? ë¥¸ìª½???5 ?ë¬¸ì¥ ê°? ???
             if item != data and bottomCheck(itemLoc[0], dataLoc[0], 2) and locationCheck(itemLoc[1], dataLoc[1], 10, -10) and len(xData) < 5:
                 xData.append(data["text"].replace(" ", ""))
 
