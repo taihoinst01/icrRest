@@ -1,0 +1,3 @@
+model_checkpoint_path: "/home/taihoinst/icrRest/entryTrain/runs/1556081944/checkpoints/model-200"
+all_model_checkpoint_paths: "/home/taihoinst/icrRest/entryTrain/runs/1556081944/checkpoints/model-100"
+all_model_checkpoint_paths: "/home/taihoinst/icrRest/entryTrain/runs/1556081944/checkpoints/model-200"
