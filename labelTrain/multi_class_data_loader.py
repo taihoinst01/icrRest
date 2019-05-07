@@ -103,7 +103,7 @@ class MultiClassDataLoader(object):
             for i, cls in enumerate(classes):
                 class_vectors[cls] = one_hot_vectors[i]
             for row in ocrData:
-                data = self.__data_processor.clean_data(row['text'])
+                data = self.__data_processor.clean_data(row['cnnData'])
                 x_text.append(data)
                 y.append((class_vectors['-1']))
             return [x_text, np.array(y)]

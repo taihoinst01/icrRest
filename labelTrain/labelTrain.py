@@ -178,5 +178,5 @@ def del_all_flags(FLAGS):
     for keys in keys_list:
         FLAGS.__delattr__(keys)
 
-# if __name__ == '__main__':
-#     startTrain()
+if __name__ == '__main__':
+    startTrain()
