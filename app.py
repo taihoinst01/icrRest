@@ -341,7 +341,7 @@ def pyOcr(item):
     ocrData = labelEval.startEval(ocrData)
 
     # findEntry CNN
-    ocrData = findEntry(ocrData)
+    ocrData = entryEval.startEval(ocrData)
 
     obj = {}
     obj["fileName"] = item[item.rfind("/")+1:]
