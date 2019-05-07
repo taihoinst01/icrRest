@@ -24,9 +24,9 @@ class MultiClassDataLoader(object):
         #self.__flags.DEFINE_string("train_data_file", "C:/projectWork/cnn-text-classification-tf-master/data/kkk.train", "Data source for the training data.")
         #self.__flags.DEFINE_string("dev_data_file", "C:/projectWork/cnn-text-classification-tf-master/data/kkk.dev", "Data source for the cross validation data.")
         #self.__flags.DEFINE_string("class_data_file", "C:/projectWork/cnn-text-classification-tf-master/data/kkk.cls", "Data source for the class list.")
-        self.__flags.DEFINE_string("train_data_file", "/home/taihoinst/icrRest/labelTrain/data/kkk.train", "Data source for the training data.")
-        self.__flags.DEFINE_string("dev_data_file", "/home/taihoinst/icrRest/labelTrain/data/kkk.dev", "Data source for the cross validation data.")
-        self.__flags.DEFINE_string("class_data_file", "/home/taihoinst/icrRest/labelTrain/data/kkk.cls", "Data source for the class list.")
+        self.__flags.DEFINE_string("train_data_file", "C:/projectWork/icrRest/labelTrain/data/kkk.train", "Data source for the training data.")
+        self.__flags.DEFINE_string("dev_data_file", "C:/projectWork/icrRest/labelTrain/data/kkk.dev", "Data source for the cross validation data.")
+        self.__flags.DEFINE_string("class_data_file", "C:/projectWork/icrRest/labelTrain/data/kkk.cls", "Data source for the class list.")
 
     def prepare_data(self):
         try:

@@ -92,8 +92,8 @@ def startTrain():
 
             # Output directory for models and summaries
             timestamp = str(int(time.time()))
-            # out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
-            out_dir = '/home/taihoinst/icrRest/entryTrain/runs/' + timestamp
+            out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+            # out_dir = '/home/taihoinst/icrRest/entryTrain/runs/' + timestamp
             print("Writing to {}\n".format(out_dir))
 
             # Summaries for loss and accuracy
@@ -178,5 +178,5 @@ def del_all_flags(FLAGS):
     for keys in keys_list:
         FLAGS.__delattr__(keys)
 
-# if __name__ == '__main__':
-#     startTrain()
+if __name__ == '__main__':
+    startTrain()

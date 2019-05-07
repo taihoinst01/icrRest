@@ -1,0 +1,3 @@
+model_checkpoint_path: "C:\\projectWork\\icrRest\\entryTrain\\runs\\1557192752\\checkpoints\\model-200"
+all_model_checkpoint_paths: "C:\\projectWork\\icrRest\\entryTrain\\runs\\1557192752\\checkpoints\\model-100"
+all_model_checkpoint_paths: "C:\\projectWork\\icrRest\\entryTrain\\runs\\1557192752\\checkpoints\\model-200"

@@ -50,7 +50,7 @@ def startEval(ocrData):
 
     # checkpoint_dir이 없다면 가장 최근 dir 추출하여 셋팅
     if FLAGS.checkpoint_dir == "":
-        all_subdirs = ["/home/taihoinst/icrRest/labelTrain/runs/" + d for d in os.listdir('/home/taihoinst/icrRest/labelTrain/runs/') if os.path.isdir("/home/taihoinst/icrRest/labelTrain/runs/" + d)]
+        all_subdirs = ["C:/projectWork/icrRest/labelTrain/runs/" + d for d in os.listdir('C:/projectWork/icrRest/labelTrain/runs/.') if os.path.isdir("C:/projectWork/icrRest/labelTrain/runs/" + d)]
         latest_subdir = max(all_subdirs, key=os.path.getmtime)
         FLAGS.checkpoint_dir = latest_subdir + "/checkpoints/"
 
