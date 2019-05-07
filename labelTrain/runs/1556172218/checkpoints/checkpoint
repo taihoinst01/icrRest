@@ -1,3 +1,0 @@
-model_checkpoint_path: "/home/taihoinst/icrRest/labelTrain/runs/1556172218/checkpoints/model-200"
-all_model_checkpoint_paths: "/home/taihoinst/icrRest/labelTrain/runs/1556172218/checkpoints/model-100"
-all_model_checkpoint_paths: "/home/taihoinst/icrRest/labelTrain/runs/1556172218/checkpoints/model-200"
