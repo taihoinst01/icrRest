@@ -473,8 +473,30 @@ def pyOcr(item):
 
 def evaluateEntry(ocrData):
     try:
-        for data in ocrData:
-            print(data)
+        for colData in ocrData:
+            if 'colLbl' in colData and int(colData['colLbl']) > 0:
+                print("colLbl:", colData)
+                colLoc = colData['location'].split(',')
+
+                # entryCheck
+                # 수평 check
+                for entryData in ocrData:
+                    if 'entryLbl' not in entryData and 'colLbl' not in entryData:
+                        entryLoc = entryData['location'].split(',')
+                        # 수평 check
+                        if locationCheck(colLoc[1], entryLoc[1], 30, -30):
+                            entryData['entyLbl'] = colData['colLbl']
+                            # print(entryData)
+
+                # 수직 check
+                for entryData in ocrData:
+                    if 'entryLbl' not in entryData and 'colLbl' not in entryData:
+                        entryLoc = entryData['location'].split(',')
+
+                        # 수직 check
+                        if locationCheck(colLoc[0], entryLoc[0], 100, -100):
+                            entryData['entryLbl'] = colData['colLbl']
+                            # print(entryData)
 
         return ocrData
     except Exception as e:
