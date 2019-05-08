@@ -515,28 +515,24 @@ def evaluateLabel(ocrData):
             labelDatas.append(data)
 
         for data in ocrData:
-            print(data)
             text = data['text'].replace(' ', '')
-            print(len(text))
 
             for labelData in labelDatas:
-                # 텍스트로 검사
-                countLabel = 0
+                tempStr = text
+                #아래쪽 일치 확인
+                for i in range(4):
 
-                for idx, t in enumerate(labelData[0]):
-
-                    try:
-                        if t[idx] == text[idx]:
-                            countLabel = countLabel + 1
-
-                        if countLabel == len(labelData[0]) - 1:
+                    if labelData[0].find(tempStr) == 0:
+                        #완전일치 확인
+                        if labelData[0] == tempStr:
                             data['colLbl'] = labelData[1]
-                            break
-                    except Exception as e:
-                        test = 1
+                        else:
+                            #아래 문장 합쳐서 tempStr에 저장
+                            print(tempStr)
+                    else:
+                        break
 
-        for data in ocrData:
-            print(data)
+                #data에 colLbl이 없으면 오른쪽 일치 확인
 
         return ocrData
     except Exception as e:
