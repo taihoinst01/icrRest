@@ -453,12 +453,10 @@ def pyOcr(item):
     {'location': '967,2616,289,47', 'text': '주식회사 산하', 'cnnData': '주식회사산하 ', 'colLbl': '768'}
     {'location': '249,2648,268,28', 'text': 'B5(182mm ※257mm)', 'cnnData': 'B5(182mm※257mm) ', 'colLbl': '768'}
     '''
-
+    # label mapping
     ocrData = evaluateLabel(ocrData)
 
-    for data in ocrData:
-        print(data)
-    # ocrData = json.loads('[{"location": "1853,269,84,54", "text": "曇."}, {"location": "267,377,199,66", "text": "1-174"}, {"location": "643,453,591,66", "text": "레디 리스트 콘크리트"}, {"location": "1274,455,176,64", "text": "납품서"}, {"location": "1312,554,163,63", "text": "4體."}, {"location": "280,649,557,34", "text": "0표 준 명 : 레디믹스트 콘크리트"}, {"location": "1342,652,379,32", "text": "132-81-13908"}, {"location": "1090,667,144,36", "text": "등록번호"}, {"location": "280,690,410,32", "text": "0표 준 번 호 . KS F 4009"}, {"location": "1027,720,207,48", "text": "亐 상 호"}, {"location": "1341,722,364,51", "text": "주식회사 é!0"}, {"location": "1683,729,179,75", "text": "•貳&譬4"}, {"location": "280,731,480,32", "text": "0인 증 번 호 . 제96-03-026호"}, {"location": "280,772,431,33", "text": "0인 증 기 관 : 한국표준협회"}, {"location": "1274,803,406,44", "text": "대표이사 전 찬 7"}, {"location": "1026,810,205,39", "text": "급 성 명"}, {"location": "280,813,643,35", "text": "0인| 증 종 류 : 보통,포장,고강도 콘크리트"}, {"location": "350,883,496,42", "text": "20 18년 11 월 08 일"}, {"location": "1273,885,475,39", "text": "경기도 남양주시 와부옵 수레로"}, {"location": "1199,890,34,30", "text": "소"}, {"location": "1026,916,35,36", "text": "자"}, {"location": "880,940,74,41", "text": "귀하"}, {"location": "288,941,287,48", "text": "대림산업(주)"}, {"location": "1090,965,146,35", "text": "대표전화"}, {"location": "1262,968,557,36", "text": "031-576-4545 출하실 031-576-3131"}, {"location": "403,1051,74,40", "text": "013"}, {"location": "1142,1052,528,71", "text": "타설완료• 0응 시 수"}, {"location": "289,1065,36,25", "text": "No"}, {"location": "287,1153,216,44", "text": "납품장소", "colLbl": "764"}, {"location": "503,1153,486,44", "text": "고덕대림아파트현장"}, {"location": "663,1248,404,44", "text": "(175) 서울14다7478"}, {"location": "286,1252,194,37", "text": "운반차번호", "colLbl":"765"}, {"location": "1439,1252,129,39", "text": "이은우"}, {"location": "858,1342,46,36", "text": "08"}, {"location": "1247,1342,45,36", "text": "03"}, {"location": "287,1392,194,36", "text": "납 품 시 각"}, {"location": "543,1439,133,36", "text": "도 착"}, {"location": "751,1522,91,37", "text": "6.00"}, {"location": "1547,1524,91,36", "text": "6.00"}, {"location": "287,1525,191,37", "text": "납 품 용 적", "colLbl": "767"}, {"location": "1185,1529,31,35", "text": "계"}, {"location": "1762,1531,34,35", "text": "m3"}, {"location": "559,1600,180,33", "text": "콘크리트의"}, {"location": "739,1600,144,33", "text": "굵은골재"}, {"location": "883,1600,108,33", "text": "의최대"}, {"location": "1277,1603,171,31", "text": "슬럼프 또는"}, {"location": "1552,1604,102,32", "text": "시멘트"}, {"location": "1654,1604,102,32", "text": "종류에"}, {"location": "1056,1623,129,32", "text": "호칭강도"}, {"location": "536,1644,231,33", "text": "종류에따른구분"}, {"location": "767,1644,231,33", "text": "치수에따른구분"}, {"location": "1276,1646,172,31", "text": "슬럼프 플로"}, {"location": "1585,1648,137,31", "text": "따른 구분"}, {"location": "284,1662,193,37", "text": "호 칭 방 법"}, {"location": "1496,1697,140,31", "text": "포를랜드"}, {"location": "1636,1697,105,31", "text": "시멘트"}, {"location": "1741,1697,70,31", "text": "1종"}, {"location": "535,1711,211,31", "text": "보통콘크리트"}, {"location": "854,1714,374,37", "text": "25 mm 18 ,••曲"}, {"location": "1324,1714,146,37", "text": "150 mm"}, {"location": "877,1799,323,41", "text": "시방 배합표(kg/m3)"}, {"location": "258,1877,93,28", "text": "시멘트"}, {"location": "351,1877,93,28", "text": "시멘트"}, {"location": "551,1878,93,36", "text": "회수수"}, {"location": "644,1878,93,36", "text": "잔골재"}, {"location": "737,1878,93,36", "text": "잔골재"}, {"location": "830,1878,93,36", "text": "산골재"}, {"location": "923,1878,124,36", "text": "굵은골재"}, {"location": "1047,1878,124,36", "text": "굵은골재"}, {"location": "1171,1878,124,36", "text": "굵은골재"}, {"location": "1295,1878,93,36", "text": "혼화재"}, {"location": "1388,1878,93,36", "text": "혼화재"}, {"location": "1481,1878,93,36", "text": "혼화재"}, {"location": "1574,1878,93,36", "text": "혼화제"}, {"location": "1667,1878,93,36", "text": "혼화제"}, {"location": "1760,1878,93,36", "text": "혼화제"}, {"location": "480,1887,26,26", "text": "물"}, {"location": "683,1916,322,26", "text": "0 ㉣ ㉭ 0"}, {"location": "1278,1917,511,25", "text": "0 ㉣ ㉭ ㉭"}, {"location": "1178,1918,23,24", "text": "㉭"}, {"location": "691,2017,149,25", "text": "467 467"}, {"location": "992,2017,28,25", "text": "91"}, {"location": "1302,2017,31,25", "text": "43"}, {"location": "1569,2017,46,25", "text": "2.0"}, {"location": "269,2133,45,36", "text": "물"}, {"location": "314,2133,180,36", "text": "결합재비"}, {"location": "742,2135,82,32", "text": "59.6"}, {"location": "1070,2135,197,36", "text": "산 골 재 율"}, {"location": "1482,2135,82,33", "text": "51.2"}, {"location": "1790,2140,26,27", "text": "0/0"}, {"location": "1340,2218,121,67", "text": "7%한"}, {"location": "269,2225,227,37", "text": "지 정 사 항"}, {"location": "1453,2311,260,40", "text": "4.5 士 15%"}, {"location": "544,2314,56,42", "text": "염화"}, {"location": "600,2314,28,42", "text": "물"}, {"location": "628,2314,336,42", "text": "량:0.3kg/m3이하"}, {"location": "1233,2317,124,37", "text": "공기랑•"}, {"location": "460,2320,33,26", "text": "고"}, {"location": "1067,2386,198,36", "text": "출하계 확인"}, {"location": "1442,2406,120,36", "text": "인 성훈"}, {"location": "274,2407,213,36", "text": "인수자 확인"}, {"location": "1058,2430,216,36", "text": "표시사항확인"}, {"location": "540,2490,993,42", "text": "(성유보강제)상일동역사거리 직진 3-7게이트 329동"}, {"location": "462,2498,31,36", "text": "타"}, {"location": "967,2616,289,47", "text": "주식회사 산하"}, {"location": "249,2648,268,28", "text": "B5(182mm ※257mm)"}]')
+    # entry mapping
     ocrData = evaluateEntry(ocrData)
 
     # findLabel CNN
@@ -482,25 +480,20 @@ def evaluateEntry(ocrData):
                 colLoc = colData['location'].split(',')
 
                 # entryCheck
-                # 수평 check
                 for entryData in ocrData:
-                    if 'entryLbl' not in entryData and 'colLbl' not in entryData:
-                        entryLoc = entryData['location'].split(',')
-                        # 수평 check
-                        if locationCheck(colLoc[1], entryLoc[1], 30, -30):
+                    entryLoc = entryData['location'].split(',')
+
+                    # 수평 check
+                    if locationCheck(colLoc[1], entryLoc[1], 30, -30):
+                        if 'entryLbl' not in entryData and 'colLbl' not in entryData:
                             entryData['entyLbl'] = colData['colLbl']
-                            # print(entryData)
+                            break
 
-                # 수직 check
-                for entryData in ocrData:
-                    if 'entryLbl' not in entryData and 'colLbl' not in entryData:
-                        entryLoc = entryData['location'].split(',')
-
-                        # 수직 check
-                        if locationCheck(colLoc[0], entryLoc[0], 100, -100):
+                    # 수직 check and colLbl 보다 아래 check
+                    elif locationCheck(colLoc[0], entryLoc[0], 100, -100) and locationCheck(colLoc[1], entryLoc[1], 50, -300):
+                        if 'entryLbl' not in entryData and 'colLbl' not in entryData:
                             entryData['entryLbl'] = colData['colLbl']
-                            # print(entryData)
-
+                            break
         return ocrData
     except Exception as e:
         print(e)
