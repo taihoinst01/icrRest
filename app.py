@@ -483,8 +483,8 @@ def evaluateEntry(ocrData):
                 for entryData in ocrData:
                     entryLoc = entryData['location'].split(',')
 
-                    # 수평 check
-                    if locationCheck(colLoc[1], entryLoc[1], 30, -30):
+                    # 수평 check and colLbl 보다 오른쪽 check
+                    if locationCheck(colLoc[1], entryLoc[1], 30, -30) and locationCheck(colLoc[0], entryLoc[0], 10, -1000):
                         if 'entryLbl' not in entryData and 'colLbl' not in entryData:
                             entryData['entyLbl'] = colData['colLbl']
                             break
