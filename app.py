@@ -20,6 +20,8 @@ import labelEval
 import entryTrain
 import entryEval
 import linedel as lineDel
+import lineDetection as lineDect
+from PIL import Image
 
 app = Flask(__name__)
 
@@ -337,7 +339,7 @@ def fileUploadTest():
     # f.save(secure_filename(convertFilename))
     # f.save(os.path.join(upload_path, convertFilename))
 
-    convertFilename = 'test2.pdf'
+    convertFilename = '경동_1.pdf'
     ext = os.path.splitext(convertFilename)[1]
 
     if ext == ".pdf":
@@ -345,6 +347,7 @@ def fileUploadTest():
         print(fileNames)
         for item in fileNames:
             imgResize(upload_path + item)
+            # lineDect.main(stringToBase64(upload_path + item))
             lineDel.main(stringToBase64(upload_path  + item))
             obj = pyOcr(upload_path + item)
             retResult.append(obj)
@@ -359,10 +362,11 @@ def fileUploadTest():
 
 def pyOcr(item):
     # item = 'C:/ICR/uploads/tempFileName_20190507141212-0.jpg'
-    # item = 'C:/ICR/test1-0.jpg'
+    # item = 'C:/ICR/test10.jpg'
     # item = 'C:/ICR/uploads/daelimTest.jpg'
     # MS ocr api 호출
     ocrData = get_Ocr_Info(item)
+
     # ocrData = json.loads('[{"location": "267,377,199,66", "text": "1-174"}, {"location": "643,453,591,66", "text": "레디 리스트 콘크리트"}, {"location": "1070,2135,197,36", "text": "산 골 재 율"}, {"location": "280,649,557,34", "text": "0표 준 명 : 레디믹스트 콘크리트"}, {"location": "280,690,410,32", "text": "0표 준 번 호 . KS F 4009"}, {"location": "280,731,480,32", "text": "0인 증 번 호 . 제96-03-026호"}, {"location": "280,772,431,33", "text": "0인 증 기 관 : 한국표준협회"}, {"location": "280,813,643,35", "text": "0인| 증 종 류 : 보통,포장,고강도 콘크리트"}, {"location": "350,883,496,42", "text": "20 18년 11 월 08 일"}, {"location": "880,940,74,41", "text": "귀하"}, {"location": "1090,667,144,36", "text": "등록번호"}, {"location": "1027,720,207,48", "text": "亐 상 호"}, {"location": "1026,810,205,39", "text": "급 성 명"}, {"location": "1199,890,34,30", "text": "소"}, {"location": "1026,916,35,36", "text": "자"}, {"location": "1090,965,146,35", "text": "대표전화"}, {"location": "288,941,287,48", "text": "대림산업(주)"}, {"location": "403,1051,74,40", "text": "013"}, {"location": "289,1065,36,25", "text": "No"}, {"location": "1853,269,84,54", "text": "曇."}, {"location": "1274,455,176,64", "text": "납품서"}, {"location": "1312,554,163,63", "text": "4體."}, {"location": "1342,652,379,32", "text": "132-81-13908"}, {"location": "1341,722,364,51", "text": "주식회사 é!0"}, {"location": "1683,729,179,75", "text": "•貳&譬4"}, {"location": "1274,803,406,44", "text": "대표이사 전 찬 7"}, {"location": "1273,885,475,39", "text": "경기도 남양주시 와부옵 수레로"}, {"location": "1262,968,557,36", "text": "031-576-4545 출하실 031-576-3131"}, {"location": "1142,1052,528,71", "text": "타설완료• 0응 시 수"}, {"location": "287,1153,694,44", "text": "납 품 장 소 고덕 대림 아파트 현장"}, {"location": "286,1252,194,37", "text": "운반차번호"}, {"location": "287,1392,194,36", "text": "납 품 시 각"}, {"location": "663,1248,404,44", "text": "(175) 서울14다7478"}, {"location": "858,1342,46,36", "text": "08"}, {"location": "1439,1252,129,39", "text": "이은우"}, {"location": "1247,1342,45,36", "text": "03"}, {"location": "543,1439,133,36", "text": "도 착"}, {"location": "287,1525,191,37", "text": "납 품 용 적"}, {"location": "751,1522,91,37", "text": "6.00"}, {"location": "1185,1529,31,35", "text": "계"}, {"location": "559,1600,423,33", "text": "콘크리트의 굵은골재의 최대"}, {"location": "1056,1623,129,32", "text": "호칭강도"}, {"location": "536,1644,449,33", "text": "종류에 따른 구분 치수에 따른 구분"}, {"location": "284,1662,193,37", "text": "호 칭 방 법"}, {"location": "535,1711,211,31", "text": "보통콘크리트"}, {"location": "854,1714,374,37", "text": "25 mm 18 ,••曲"}, {"location": "877,1799,323,41", "text": "시방 배합표(kg/m3)"}, {"location": "1277,1603,171,31", "text": "슬럼프 또는"}, {"location": "1276,1646,172,31", "text": "슬럼프 플로"}, {"location": "1547,1524,91,36", "text": "6.00"}, {"location": "1762,1531,34,35", "text": "m3"}, {"location": "1552,1604,199,32", "text": "시멘트 종류에"}, {"location": "1585,1648,137,31", "text": "따른 구분"}, {"location": "1496,1697,309,31", "text": "포를랜드시멘트 1종"}, {"location": "1324,1714,146,37", "text": "150 mm"}, {"location": "258,1877,181,28", "text": "시멘트 시멘트"}, {"location": "480,1887,26,26", "text": "물"}, {"location": "551,1878,1267,36", "text": "회수수 잔골재 잔골재 산골재 굵은골재굵은골재 굵은골재 혼화재 혼화재 혼화재 혼화제 혼화제 혼화제"}, {"location": "683,1916,322,26", "text": "0 ㉣ ㉭ 0"}, {"location": "1178,1918,23,24", "text": "㉭"}, {"location": "1278,1917,511,25", "text": "0 ㉣ ㉭ ㉭"}, {"location": "691,2017,149,25", "text": "467 467"}, {"location": "742,2135,82,32", "text": "59.6"}, {"location": "544,2314,418,42", "text": "염화물량 : 0.3kg/m3 이하"}, {"location": "992,2017,28,25", "text": "91"}, {"location": "1302,2017,31,25", "text": "43"}, {"location": "1569,2017,46,25", "text": "2.0"}, {"location": "1482,2135,82,33", "text": "51.2"}, {"location": "269,2133,223,36", "text": "물결합재비"}, {"location": "269,2225,227,37", "text": "지 정 사 항"}, {"location": "460,2320,33,26", "text": "고"}, {"location": "274,2407,213,36", "text": "인수자 확인"}, {"location": "462,2498,31,36", "text": "타"}, {"location": "249,2648,268,28", "text": "B5(182mm ※257mm)"}, {"location": "1790,2140,26,27", "text": "0/0"}, {"location": "1340,2218,121,67", "text": "7%한"}, {"location": "1453,2311,260,40", "text": "4.5 士 15%"}, {"location": "1233,2317,124,37", "text": "공기랑•"}, {"location": "1067,2386,198,36", "text": "출하계 확인"}, {"location": "1442,2406,120,36", "text": "인 성훈"}, {"location": "1058,2430,216,36", "text": "표시사항확인"}, {"location": "540,2490,993,42", "text": "(성유보강제)상일동역사거리 직진 3-7게이트 329동"}, {"location": "967,2616,289,47", "text": "주식회사 산하"}]')
     # Y축정렬
     ocrData = sortArrLocation(ocrData)
@@ -385,118 +389,8 @@ def pyOcr(item):
     # entry 추출
     # entryData = findColByML(ocrData)
 
-    '''
-    {'location': '1853,269,84,54', 'text': '曇.', 'cnnData': '曇. ', 'colLbl': '768'}
-    {'location': '267,377,199,66', 'text': '1-174', 'cnnData': '1-174 시멘트 물 지정사항 인수자확인', 'colLbl': '768'}
-    {'location': '643,453,591,66', 'text': '레디 리스트 콘크리트', 'cnnData': '레디리스트콘크리트 납품서 잔골재', 'colLbl': '768'}
-    {'location': '1274,455,176,64', 'text': '납품서', 'cnnData': '납품서 대표이사전찬7 경기도남양주시와부옵수레로 슬럼프또는 슬럼프플로', 'colLbl': '768'}
-    {'location': '1312,554,163,63', 'text': '4體.', 'cnnData': '4體. ', 'colLbl': '768'}
-    {'location': '280,649,40,34', 'text': '0', 'cnnData': '0 표준명 :레디믹스트콘크리트 132-81-13908 0표준번호.KSF4009 0인증번호.제96-03-026호 0인증기관:한국표준협회 0인|증종류:보통포장고강도콘크리트', 'colLbl': '768'}
-    {'location': '320,649,120,34', 'text': '표준명', 'cnnData': '표준명 :레디믹스트콘크리트 132-81-13908 결합재비', 'colLbl': '768'}
-    {'location': '440,649,400,34', 'text': ':레디믹스트콘크리트', 'cnnData': ':레디믹스트콘크리트 132-81-13908 ', 'colLbl': '768'}
-    {'location': '1342,652,379,32', 'text': '132-81-13908', 'cnnData': '132-81-13908 주식회사é!0 7%한', 'colLbl': '768'}
-    {'location': '1090,667,144,36', 'text': '등록번호', 'cnnData': '등록번호 대표전화', 'colLbl': '768'}
-    {'location': '280,690,410,32', 'text': '0표 준 번 호 . KS F 4009', 'cnnData': '0표준번호.KSF4009 0인증번호.제96-03-026호 0인증기관:한국표준협회 0인|증종류:보통포장고강도콘크리트 대림산업(주)', 'colLbl': '768'}
-    {'location': '1027,720,207,48', 'text': '亐 상 호', 'cnnData': '亐상호 주식회사é!0 •貳&譬4 급성명 자', 'colLbl': '768'}
-    {'location': '1341,722,364,51', 'text': '주식회사 é!0', 'cnnData': '주식회사é!0 •貳&譬4 7%한', 'colLbl': '768'}
-    {'location': '1683,729,179,75', 'text': '•貳&譬4', 'cnnData': '•貳&譬4 ', 'colLbl': '768'}
-    {'location': '280,731,480,32', 'text': '0인 증 번 호 . 제96-03-026호', 'cnnData': '0인증번호.제96-03-026호 주식회사é!0 •貳&譬4 0인증기관:한국표준협회 0인|증종류:보통포장고강도콘크리트 대림산업(주) No', 'colLbl': '768'}
-    {'location': '280,772,431,33', 'text': '0인 증 기 관 : 한국표준협회', 'cnnData': '0인증기관:한국표준협회 0인|증종류:보통포장고강도콘크리트 대림산업(주) No 납품장소고덕대림아파트현장', 'colLbl': '768'}
-    {'location': '1274,803,406,44', 'text': '대표이사 전 찬 7', 'cnnData': '대표이사전찬7 경기도남양주시와부옵수레로 슬럼프또는 슬럼프플로 0㉣㉭㉭', 'colLbl': '768'}
-    {'location': '1026,810,205,39', 'text': '급 성 명', 'cnnData': '급성명 대표이사전찬7 자', 'colLbl': '768'}
-    {'location': '280,813,643,35', 'text': '0인| 증 종 류 : 보통,포장,고강도 콘크리트', 'cnnData': '0인|증종류:보통포장고강도콘크리트 급성명 대림산업(주) No 납품장소고덕대림아파트현장 운반차번호', 'colLbl': '768'}
-    {'location': '350,883,496,42', 'text': '20 18년 11 월 08 일', 'cnnData': '2018년11월08일 경기도남양주시와부옵수레로 소 시멘트', 'colLbl': '768'}
-    {'location': '1273,885,475,39', 'text': '경기도 남양주시 와부옵 수레로', 'cnnData': '경기도남양주시와부옵수레로 슬럼프또는 슬럼프플로 0㉣㉭㉭', 'colLbl': '768'}
-    {'location': '1199,890,34,30', 'text': '소', 'cnnData': '소 경기도남양주시와부옵수레로 ', 'colLbl': '768'}
-    {'location': '1026,916,35,36', 'text': '자', 'cnnData': '자 ', 'colLbl': '768'}
-    {'location': '880,940,74,41', 'text': '귀하', 'cnnData': '귀하 의최대 시방배합표(kg/m3)', 'colLbl': '768'}
-    {'location': '288,941,287,48', 'text': '대림산업(주)', 'cnnData': '대림산업(주) 귀하 No 납품장소고덕대림아파트현장 운반차번호 납품시각', 'colLbl': '768'}
-    {'location': '1090,965,146,35', 'text': '대표전화', 'cnnData': '대표전화 031-576-4545출하실031-576-3131 ', 'colLbl': '768'}
-    {'location': '1262,968,557,36', 'text': '031-576-4545 출하실 031-576-3131', 'cnnData': '031-576-4545출하실031-576-3131 ', 'colLbl': '768'}
-    {'location': '403,1051,74,40', 'text': '013', 'cnnData': '013 타설완료•0응시수 ', 'colLbl': '768'}
-    {'location': '1142,1052,528,71', 'text': '타설완료• 0응 시 수', 'cnnData': '타설완료•0응시수 ', 'colLbl': '768'}
-    {'location': '289,1065,36,25', 'text': 'No', 'cnnData': 'No 납품장소고덕대림아파트현장 운반차번호 납품시각 납품용적', 'colLbl': '792'}
-    {'location': '287,1153,694,44', 'text': '납 품 장 소 고덕 대림 아파트 현장', 'cnnData': '납품장소고덕대림아파트현장 운반차번호 납품시각 납품용적 호칭방법', 'colLbl': '768'}
-    {'location': '663,1248,404,44', 'text': '(175) 서울14다7478', 'cnnData': '(175)서울14다7478 이은우 ', 'colLbl': '768'}
-    {'location': '286,1252,194,37', 'text': '운반차번호', 'cnnData': '운반차번호 (175)서울14다7478 이은우 납품시각 납품용적 호칭방법', 'colLbl': '765'}
-    {'location': '1439,1252,129,39', 'text': '이은우', 'cnnData': '이은우 인성훈', 'colLbl': '768'}
-    {'location': '858,1342,46,36', 'text': '08', 'cnnData': '08 03 25mm18••曲', 'colLbl': '768'}
-    {'location': '1247,1342,45,36', 'text': '03', 'cnnData': '03 ', 'colLbl': '768'}
-    {'location': '287,1392,194,36', 'text': '납 품 시 각', 'cnnData': '납품시각 납품용적 호칭방법', 'colLbl': '768'}
-    {'location': '543,1439,133,36', 'text': '도 착', 'cnnData': '도착 종류에따른구분 보통콘크리트 회수수 염화', 'colLbl': '768'}
-    {'location': '751,1522,91,37', 'text': '6.00', 'cnnData': '6.00 6.00 계 m3 59.6', 'colLbl': '768'}
-    {'location': '1547,1524,91,36', 'text': '6.00', 'cnnData': '6.00 m3 시멘트', 'colLbl': '768'}
-    {'location': '287,1525,191,37', 'text': '납 품 용 적', 'cnnData': '납품용적 6.00 6.00 계 m3 호칭방법', 'colLbl': '768'}
-    {'location': '1185,1529,31,35', 'text': '계', 'cnnData': '계 6.00 m3 ㉭', 'colLbl': '768'}
-    {'location': '1762,1531,34,35', 'text': 'm3', 'cnnData': 'm3 혼화제', 'colLbl': '768'}
-    {'location': '559,1600,180,33', 'text': '콘크리트의', 'cnnData': '콘크리트의 굵은골재 의최대 슬럼프또는 시멘트 회수수', 'colLbl': '768'}
-    {'location': '739,1600,144,33', 'text': '굵은골재', 'cnnData': '굵은골재 의최대 슬럼프또는 시멘트 종류에 잔골재 59.6', 'colLbl': '783'}
-    {'location': '883,1600,108,33', 'text': '의최대', 'cnnData': '의최대 슬럼프또는 시멘트 종류에 시방배합표(kg/m3)', 'colLbl': '768'}
-    {'location': '1277,1603,171,31', 'text': '슬럼프 또는', 'cnnData': '슬럼프또는 시멘트 종류에 슬럼프플로 0㉣㉭㉭', 'colLbl': '768'}
-    {'location': '1552,1604,102,32', 'text': '시멘트', 'cnnData': '시멘트 종류에 ', 'colLbl': '775'}
-    {'location': '1654,1604,102,32', 'text': '종류에', 'cnnData': '종류에 ', 'colLbl': '768'}
-    {'location': '1056,1623,129,32', 'text': '호칭강도', 'cnnData': '호칭강도 굵은골재 표시사항확인', 'colLbl': '771'}
-    {'location': '536,1644,231,33', 'text': '종류에따른구분', 'cnnData': '종류에따른구분 치수에따른구분 슬럼프플로 따른구분 보통콘크리트 염화 (성유보강제)상일동역사거리직진3-7게이트329동', 'colLbl': '768'}
-    {'location': '767,1644,231,33', 'text': '치수에따른구분', 'cnnData': '치수에따른구분 슬럼프플로 따른구분 ', 'colLbl': '768'}
-    {'location': '1276,1646,172,31', 'text': '슬럼프 플로', 'cnnData': '슬럼프플로 따른구분 0㉣㉭㉭', 'colLbl': '768'}
-    {'location': '1585,1648,137,31', 'text': '따른 구분', 'cnnData': '따른구분 ', 'colLbl': '768'}
-    {'location': '284,1662,193,37', 'text': '호 칭 방 법', 'cnnData': '호칭방법 ', 'colLbl': '768'}
-    {'location': '1496,1697,140,31', 'text': '포를랜드', 'cnnData': '포를랜드 시멘트 1종 ', 'colLbl': '768'}
-    {'location': '1636,1697,105,31', 'text': '시멘트', 'cnnData': '시멘트 1종 ', 'colLbl': '775'}
-    {'location': '1741,1697,70,31', 'text': '1종', 'cnnData': '1종 ', 'colLbl': '768'}
-    {'location': '535,1711,211,31', 'text': '보통콘크리트', 'cnnData': '보통콘크리트 25mm18••曲 150mm 염화 (성유보강제)상일동역사거리직진3-7게이트329동', 'colLbl': '768'}
-    {'location': '854,1714,374,37', 'text': '25 mm 18 ,••曲', 'cnnData': '25mm18••曲 150mm ', 'colLbl': '768'}
-    {'location': '1324,1714,146,37', 'text': '150 mm', 'cnnData': '150mm ', 'colLbl': '768'}
-    {'location': '877,1799,323,41', 'text': '시방 배합표(kg/m3)', 'cnnData': '시방배합표(kg/m3) ', 'colLbl': '768'}
-    {'location': '258,1877,93,28', 'text': '시멘트', 'cnnData': '시멘트 시멘트 회수수 잔골재 잔골재 B5(182mm※257mm)', 'colLbl': '775'}
-    {'location': '351,1877,93,28', 'text': '시멘트', 'cnnData': '시멘트 회수수 잔골재 잔골재 산골재 ', 'colLbl': '775'}
-    {'location': '551,1878,93,36', 'text': '회수수', 'cnnData': '회수수 잔골재 잔골재 산골재 굵은골재 염화', 'colLbl': '777'}
-    {'location': '644,1878,93,36', 'text': '잔골재', 'cnnData': '잔골재 잔골재 산골재 굵은골재 굵은골재 ', 'colLbl': '780'}
-    {'location': '737,1878,93,36', 'text': '잔골재', 'cnnData': '잔골재 산골재 굵은골재 굵은골재 굵은골재 59.6', 'colLbl': '780'}
-    {'location': '830,1878,93,36', 'text': '산골재', 'cnnData': '산골재 굵은골재 굵은골재 굵은골재 혼화재 ', 'colLbl': '768'}
-    {'location': '923,1878,124,36', 'text': '굵은골재', 'cnnData': '굵은골재 굵은골재 굵은골재 혼화재 혼화재 ', 'colLbl': '783'}
-    {'location': '1047,1878,124,36', 'text': '굵은골재', 'cnnData': '굵은골재 굵은골재 혼화재 혼화재 혼화재 ', 'colLbl': '783'}
-    {'location': '1171,1878,124,36', 'text': '굵은골재', 'cnnData': '굵은골재 혼화재 혼화재 혼화재 혼화제 ㉭', 'colLbl': '783'}
-    {'location': '1295,1878,93,36', 'text': '혼화재', 'cnnData': '혼화재 혼화재 혼화재 혼화제 혼화제 43', 'colLbl': '786'}
-    {'location': '1388,1878,93,36', 'text': '혼화재', 'cnnData': '혼화재 혼화재 혼화제 혼화제 혼화제 ', 'colLbl': '786'}
-    {'location': '1481,1878,93,36', 'text': '혼화재', 'cnnData': '혼화재 혼화제 혼화제 혼화제 51.2', 'colLbl': '786'}
-    {'location': '1574,1878,93,36', 'text': '혼화제', 'cnnData': '혼화제 혼화제 혼화제 2.0', 'colLbl': '789'}
-    {'location': '1667,1878,93,36', 'text': '혼화제', 'cnnData': '혼화제 혼화제 ', 'colLbl': '789'}
-    {'location': '1760,1878,93,36', 'text': '혼화제', 'cnnData': '혼화제 ', 'colLbl': '789'}
-    {'location': '480,1887,26,26', 'text': '물', 'cnnData': '물 회수수 잔골재 잔골재 산골재 ', 'colLbl': '776'}
-    {'location': '683,1916,322,26', 'text': '0 ㉣ ㉭ 0', 'cnnData': '0㉣㉭0 0㉣㉭㉭ ㉭ 467467', 'colLbl': '768'}
-    {'location': '1278,1917,511,25', 'text': '0 ㉣ ㉭ ㉭', 'cnnData': '0㉣㉭㉭ ', 'colLbl': '768'}
-    {'location': '1178,1918,23,24', 'text': '㉭', 'cnnData': '㉭ 0㉣㉭㉭ ', 'colLbl': '768'}
-    {'location': '691,2017,149,25', 'text': '467 467', 'cnnData': '467467 91 43 2.0 ', 'colLbl': '768'}
-    {'location': '992,2017,28,25', 'text': '91', 'cnnData': '91 43 2.0 ', 'colLbl': '768'}
-    {'location': '1302,2017,31,25', 'text': '43', 'cnnData': '43 2.0 ', 'colLbl': '768'}
-    {'location': '1569,2017,46,25', 'text': '2.0', 'cnnData': '2.0 ', 'colLbl': '768'}
-    {'location': '269,2133,45,36', 'text': '물', 'cnnData': '물 결합재비 59.6 산골재율 51.2 지정사항 인수자확인', 'colLbl': '776'}
-    {'location': '314,2133,180,36', 'text': '결합재비', 'cnnData': '결합재비 59.6 산골재율 51.2 0/0 ', 'colLbl': '768'}
-    {'location': '742,2135,82,32', 'text': '59.6', 'cnnData': '59.6 산골재율 51.2 0/0 ', 'colLbl': '768'}
-    {'location': '1070,2135,197,36', 'text': '산 골 재 율', 'cnnData': '산골재율 51.2 0/0 출하계확인', 'colLbl': '768'}
-    {'location': '1482,2135,82,33', 'text': '51.2', 'cnnData': '51.2 0/0 ', 'colLbl': '768'}
-    {'location': '1790,2140,26,27', 'text': '0/0', 'cnnData': '0/0 ', 'colLbl': '768'}
-    {'location': '1340,2218,121,67', 'text': '7%한', 'cnnData': '7%한 ', 'colLbl': '768'}
-    {'location': '269,2225,227,37', 'text': '지 정 사 항', 'cnnData': '지정사항 7%한 인수자확인', 'colLbl': '768'}
-    {'location': '1453,2311,260,40', 'text': '4.5 士 15%', 'cnnData': '4.5士15% ', 'colLbl': '768'}
-    {'location': '544,2314,56,42', 'text': '염화', 'cnnData': '염화 4.5士15% 물 량:0.3kg/m3이하 공기랑• (성유보강제)상일동역사거리직진3-7게이트329동', 'colLbl': '768'}
-    {'location': '600,2314,28,42', 'text': '물', 'cnnData': '물 4.5士15% 량:0.3kg/m3이하 공기랑• ', 'colLbl': '776'}
-    {'location': '628,2314,336,42', 'text': '량:0.3kg/m3이하', 'cnnData': '량:0.3kg/m3이하 4.5士15% 공기랑• ', 'colLbl': '768'}
-    {'location': '1233,2317,124,37', 'text': '공기랑•', 'cnnData': '공기랑• 4.5士15% ', 'colLbl': '768'}
-    {'location': '460,2320,33,26', 'text': '고', 'cnnData': '고 4.5士15% 염화 물 량:0.3kg/m3이하 타', 'colLbl': '768'}
-    {'location': '1067,2386,198,36', 'text': '출하계 확인', 'cnnData': '출하계확인 표시사항확인', 'colLbl': '768'}
-    {'location': '1442,2406,120,36', 'text': '인 성훈', 'cnnData': '인성훈 ', 'colLbl': '768'}
-    {'location': '274,2407,213,36', 'text': '인수자 확인', 'cnnData': '인수자확인 인성훈 ', 'colLbl': '768'}
-    {'location': '1058,2430,216,36', 'text': '표시사항확인', 'cnnData': '표시사항확인 ', 'colLbl': '768'}
-    {'location': '540,2490,993,42', 'text': '(성유보강제)상일동역사거리 직진 3-7게이트 329동', 'cnnData': '(성유보강제)상일동역사거리직진3-7게이트329동 ', 'colLbl': '768'}
-    {'location': '462,2498,31,36', 'text': '타', 'cnnData': '타 (성유보강제)상일동역사거리직진3-7게이트329동 ', 'colLbl': '768'}
-    {'location': '967,2616,289,47', 'text': '주식회사 산하', 'cnnData': '주식회사산하 ', 'colLbl': '768'}
-    {'location': '249,2648,268,28', 'text': 'B5(182mm ※257mm)', 'cnnData': 'B5(182mm※257mm) ', 'colLbl': '768'}
-    '''
-
     # label mapping
-    ocrData = evaluateLabel(ocrData)
+    ocrData = evaluateLabelMulti(ocrData)
 
     # entry mapping
     ocrData = evaluateEntry(ocrData)
@@ -512,41 +406,229 @@ def pyOcr(item):
     obj["docCategory"] = {"DOCTYPE": docType, "DOCTOPTYPE": docTopType, "DOCSCORE": maxNum}
     obj["data"] = ocrData
 
-    print("=---------------")
+    print("-------------result---------------")
     for item in obj['data']:
         print(item)
+
+    print(obj)
     return obj
 
 def evaluateEntry(ocrData):
     try:
+        colNum = [765,766]
+        labelDatas = []
+        ocrDataX = sortArrLocationX(ocrData)
+        trainData = 'C:/projectWork/icrRest/labelTrain/data/invoice.train'
+        f = open(trainData, 'r', encoding='utf-8')
+        lines = f.readlines()
+
+        for line in lines:
+            data = line.split('||')
+            data[3] = data[3][:-1]
+            labelDatas.append(data)
+
         for colData in ocrData:
             if 'colLbl' in colData and int(colData['colLbl']) > 0:
                 colLoc = colData['location'].split(',')
 
-                # entryCheck
-                for entryData in ocrData:
-                    entryLoc = entryData['location'].split(',')
+                # single multi check
+                entryCheck = 'single'
+                for labelData in labelDatas:
+                    if colData['colLbl'] == labelData[1]:
+                        entryCheck = labelData[2]
 
-                    # 수평 check and colLbl 보다 오른쪽 check
-                    if locationCheck(colLoc[1], entryLoc[1], 30, -30) and locationCheck(colLoc[0], entryLoc[0], 10, -1000):
-                        if 'entryLbl' not in entryData and 'colLbl' not in entryData:
-                            entryData['entyLbl'] = colData['colLbl']
-                            break
+                if entryCheck == 'single':
+                    singleExit = False
 
-                    # 수직 check and colLbl 보다 아래 check
-                    elif locationCheck(colLoc[0], entryLoc[0], 100, -100) and locationCheck(colLoc[1], entryLoc[1], 50, -300):
-                        if 'entryLbl' not in entryData and 'colLbl' not in entryData:
-                            entryData['entryLbl'] = colData['colLbl']
-                            break
+                    # entryCheck
+                    for entryData in ocrDataX:
+                        entryLoc = entryData['location'].split(',')
+
+                        # 수평 check and colLbl 보다 오른쪽 check
+                        if locationCheck(colLoc[1], entryLoc[1], 30, -50) and locationCheck(colLoc[0], entryLoc[0], 10, -1000):
+                            if 'entryLbl' not in entryData and 'colLbl' not in entryData:
+                                entryData['entryLbl'] = colData['colLbl']
+                                singleExit = True
+                                break
+
+                    if singleExit == True:
+                        continue
+
+                    for entryData in ocrData:
+                        entryLoc = entryData['location'].split(',')
+
+                        # 수직 check and colLbl 보다 아래 check
+                        if verticalCheck(colLoc, entryLoc, 50, -100) and locationCheck(colLoc[1], entryLoc[1], 15, -250) and int(colData['colLbl']) not in colNum:
+                            if 'entryLbl' not in entryData and 'colLbl' not in entryData:
+                                entryData['entryLbl'] = colData['colLbl']
+                                break
+
+                elif entryCheck == 'multi':
+                    for entryData in ocrData:
+                        entryLoc = entryData['location'].split(',')
+
+                        if verticalCheck(colLoc, entryLoc, 20, -20) and locationCheck(colLoc[1], entryLoc[1], 15, -2000):
+                            if 'entryLbl' not in entryData and 'colLbl' not in entryData:
+                                entryData['entryLbl'] = colData['colLbl']
+
+
         return ocrData
     except Exception as e:
         print(e)
+
+
+def evaluateLabelMulti(ocrData):
+    try:
+        labelDatas = []
+        delDatas = []
+        # ocrData = json.loads('[{"location": "1289,1409,195,38", "text": "슬럼프또는"},{"location": "382,1410,336,54", "text": "콘크리트의종류에"},{"location": "718,1410,168,54", "text": "굵은골재"},{"location": "886,1410,126,54", "text": "의최대"},{"location": "1075,1410,148,39", "text": "호칭강도"},{"location": "1617,1426,231,39", "text": "시멘트 종류에"},{"location": "1289,1455,194,38", "text": "슬럼프 플로"},{"location": "740,1457,280,38", "text": "치수에따른구분"},{"location": "1649,1489,170,38", "text": "따른 구분"},{"location": "440,1493,191,38", "text": "따른 구분"}]')
+        ocrDataX = sortArrLocationX(ocrData)
+        trainData = 'C:/projectWork/icrRest/labelTrain/data/invoice.train'
+        f = open(trainData, 'r', encoding='utf-8')
+        lines = f.readlines()
+
+        # for item in ocrData:
+        #     print(item)
+
+        for line in lines:
+            data = line.split('||')
+            data[3] = data[3][:-1]
+            labelDatas.append(data)
+
+        for data in ocrData:
+            text = data['text'].replace(' ', '')
+            dataLoc = data['location'].split(',')
+
+            for labelData in labelDatas:
+                insertDatas = []
+                deletes = []
+                tempStr = text
+
+                # data에 colLbl이 없으면 오른쪽 일치 확인
+                for i in range(5):
+                    if labelData[0].lower().find(tempStr.lower()) == 0:
+                        # 완전일치 확인
+                        if labelData[0].lower() == tempStr.lower():
+                            data['colLbl'] = labelData[1]
+
+                            for insertData in insertDatas:
+                                data['text'] += ' ' + insertData['text']
+
+                            for delete in deletes:
+                                delDatas.append(delete)
+
+                            break
+                        else:
+                            # 옆 문장 합쳐서 tempStr에 저장
+                            for horiData in ocrDataX:
+                                bottomLoc = horiData['location'].split(',')
+
+                                # 수평 check
+                                if locationCheck(dataLoc[1], bottomLoc[1], 20, -20) and locationCheck(dataLoc[0], bottomLoc[0], 10, -1000) and data['text'] != horiData['text'] and horiData not in insertDatas:
+                                    tempStr += horiData['text'].replace(' ', '')
+                                    deletes.append(horiData)
+                                    insertDatas.append(horiData)
+                                    break
+                    else:
+                        break
+
+        for data in ocrData:
+            text = data['text'].replace(' ', '')
+            dataLoc = data['location'].split(',')
+            check = False
+            # print('00000000', data, '0000000')
+            for labelData in labelDatas:
+                insertDatas = []
+                if labelData[0].lower().find(text.lower()) == 0:
+                    for bottomData in ocrData:
+                        bottomLoc = bottomData['location'].split(',')
+
+                        if locationCheck(dataLoc[1], bottomLoc[1], 20, -20) and locationCheck(dataLoc[0], bottomLoc[0],10, -250) and data['text'] != bottomData['text']:
+                            insertDatas.append(bottomData)
+
+                        if verticalCheck(dataLoc, bottomLoc, 90, -100) and locationCheck(dataLoc[1], bottomLoc[1], 0, -150):
+                            insertDatas.append(bottomData)
+
+                tempStr = text
+
+                for i in range(10):
+                    # print(i, ',', labelData[0])
+                    for insertData in insertDatas:
+                        str = tempStr + insertData['text'].replace(' ', '')
+                        if labelData[0].lower().find(str.lower()) == 0:
+                            tempStr = tempStr + insertData['text'].replace(' ', '')
+                            delDatas.append(insertData)
+
+                        # print(insertData['text'], ',', str)
+
+                        if labelData[0].lower() == tempStr.lower():
+                            data['colLbl'] = labelData[1]
+                            data['text'] = tempStr
+                            check = True
+                            break
+
+                    if check == True:
+                        break
+
+                if check == True:
+                    check = False
+                    break
+
+        delDatas = uniq(delDatas)
+        for delData in delDatas:
+            ocrData.remove(delData)
+
+        return ocrData
+    except Exception as e:
+        print(e)
+
+def uniq(ocrData):
+    result = []
+    for a in ocrData:
+        if result.count(a) < 1:
+            result.append(a)
+    return result
+
+def sortArrLocationX(inputArr):
+    tempArr = []
+    retArr = []
+    for item in inputArr:
+        tempArr.append((makeindexX(item['location']), item))
+    tempArr.sort(key=operator.itemgetter(0))
+    for tempItem in tempArr:
+        retArr.append(tempItem[1])
+    return retArr
+
+def makeindexX(location):
+    if len(location) > 0:
+        temparr = location.split(",")
+        for i in range(0, 5):
+            if (len(temparr[1]) < 5):
+                temparr[1] = '0' + temparr[1]
+        return int(temparr[0] + temparr[1])
+    else:
+        return 999999999999
+
+def verticalCheck(lblLoc, entLoc, plus, minus):
+    try:
+        lblwidthLoc = (int(lblLoc[0]) + (int(lblLoc[0]) + int(lblLoc[2]))) / 2
+        entwidthLoc = (int(entLoc[0]) + (int(entLoc[0]) + int(entLoc[2]))) / 2
+
+        if minus < lblwidthLoc - entwidthLoc < plus:
+            return True
+        else:
+            return False
+
+    except Exception as e:
+        raise Exception(str({'code': 500, 'message': 'checkVerticalEntry fail',
+                         'error': str(e).replace("'", "").replace('"', '')}))
 
 def evaluateLabel(ocrData):
     try:
         labelDatas = []
         delDatas = []
         trainData = 'C:/projectWork/icrRest/labelTrain/data/kkk.train'
+        # trainData = 'C:/projectWork/icrRest/labelTrain/data/invoice.train'
         f = open(trainData, 'r', encoding='utf-8')
         lines = f.readlines()
 
@@ -589,8 +671,9 @@ def evaluateLabel(ocrData):
                                     insertDatas.append(bottomData)
                     else:
                         break
-
                 # data에 colLbl이 없으면 오른쪽 일치 확인
+
+
         delDatas = uniq(delDatas)
         for delData in delDatas:
             ocrData.remove(delData)
@@ -599,12 +682,7 @@ def evaluateLabel(ocrData):
     except Exception as e:
         print(e)
 
-def uniq(ocrData):
-    result = []
-    for a in ocrData:
-        if result.count(a) < 1:
-            result.append(a)
-    return result
+
 
 # pdf 에서 png 변환 함수
 def convertPdfToImage(upload_path, pdf_file):
@@ -710,6 +788,10 @@ def get_Ocr_Info(filePath):
         response = conn.getresponse()
         data = response.read()
         data = json.loads(data)
+
+        if data['orientation'] != 'Up':
+            rotate(filePath, data)
+
         data = ocrParsing(data)
         conn.close()
 
@@ -726,6 +808,23 @@ def ocrParsing(body):
                 item += k["text"] + " "
             data.append({"location":j["boundingBox"], "text":item[:-1]})
     return data
+
+def rotate(filePath, ocrData):
+    im = Image.open(filePath)
+
+    if ocrData['orientation'] == 'Left':
+        angle = -90
+    elif ocrData['orientation'] == 'Right':
+        angle = 90
+    elif ocrData['orientation'] == 'Down':
+        angel = 180
+
+    img3 = im.rotate(-90, expand=1)
+    img3.save(filePath)
+
+    get_Ocr_Info(filePath)
+
+
 
 # y ?? ??
 def sortArrLocation(inputArr):
@@ -867,21 +966,6 @@ def splitText(text, split):
             break
 
     return result
-
-def verticalCheck(lblLoc, entLoc, plus, minus):
-    try:
-        lblwidthLoc = (int(lblLoc[0]) + (int(lblLoc[0]) +int(lblLoc[2]))) / 2
-        entwidthLoc = (int(entLoc[0]) + (int(entLoc[0]) + int(entLoc[2]))) / 2
-
-        if minus < lblwidthLoc - entwidthLoc < plus:
-            return True
-        else:
-            return False
-
-    except Exception as e:
-        raise Exception(str({'code': 500, 'message': 'checkVerticalEntry fail',
-                         'error': str(e).replace("'", "").replace('"', '')}))
-
 
 def locationCheck(loc1, loc2, plus, minus):
     if minus < int(loc1) - int(loc2) < plus:
@@ -1029,6 +1113,6 @@ def findColByML(ocrData):
 
 
 if __name__=='__main__':
-    # app.run(host='0.0.0.0',port=5000,debug=True)
+    # app.run(host='0.0.0.0',port=5000,debug=False)
     fileUploadTest()
     # pyOcr('test')
