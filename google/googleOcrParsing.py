@@ -119,10 +119,10 @@ def googleOcrParsing(response):
                         ocrData, idx = combiendText(ocrData, combineData, idx)
 
                     # 같은 줄에 다음 text와 합쳐서 레이블의 부분일 경우 합친다
-                    ocrData, idx = convertLabelText(ocrData, combineData, labelTexts, idx)
+                    ocrData, idx = combiendLabelText(ocrData, combineData, labelTexts, idx)
 
                     # 같은 줄에 다음 text가 숫자 다음 '시' 숫자 '분'  경우 합친다.
-                    ocrData, idx = convertTimeText(ocrData, combineData, idx)
+                    ocrData, idx = combiendTimeText(ocrData, combineData, idx)
             idx += 1
 
         ocrPreProcessData = ocrData
@@ -277,7 +277,7 @@ def combiendText(ocrData, combiendData, idx):
             {'code': 500, 'message': 'combiendText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text와 다음 텍스트가 레이블 문자에 포함하면 합친다.
-def convertLabelText(ocrData, combineData, labelTexts, idx):
+def combiendLabelText(ocrData, combineData, labelTexts, idx):
     try:
         targetLabelTexts = []
 
@@ -304,7 +304,7 @@ def convertLabelText(ocrData, combineData, labelTexts, idx):
             {'code': 500, 'message': 'convertLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text가 숫자 다음 '시' 숫자 '분' 경우 합친다.
-def convertTimeText(ocrData, combineData, idx):
+def combiendTimeText(ocrData, combineData, idx):
     try:
         caseOne = regMatch('\d{1,2}시{1}', ocrData[idx]["text"].replace(" ", "")) and regMatch('\d{1,2}분{1}', combineData["text"].replace(" ", ""))
         caseTwo = regMatch('\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('시', combineData["text"].replace(" ", ""))
