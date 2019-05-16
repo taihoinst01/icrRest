@@ -10,6 +10,7 @@ import math
 from pdf2image import convert_from_path, convert_from_bytes
 from google.cloud import vision
 import io
+import re
 #지워야할 수평 선의 두께
 deleteHorizontalLineWeight = 2
 #지워야할 수직 선의 두께
@@ -55,8 +56,11 @@ def ocrReq(filefolder,file_list):
 
             ocrData = googleOcrParsing(response)
             #print(str(ocrData).replace("'", '"'))
+            f = open("C:\\Users\\Taiho\\Desktop\\input.txt", 'w')
+            f.write(str(ocrData).replace("'", '"'))
+            f.close()
 
-            break;
+            break
 
     return response
 
@@ -65,12 +69,10 @@ def googleOcrParsing(response):
     ocrData = []
     for page in response.full_text_annotation.pages:
         for block in page.blocks:
-            # print('\nBlock confidence: {}\n'.format(block.confidence))
-
             for paragraph in block.paragraphs:
                 # print('Paragraph confidence: {}'.format(paragraph.confidence))
+                for word in paragraph.words:               
 
-                for word in paragraph.words:
                     word_text = ''.join([
                         symbol.text for symbol in word.symbols
                     ])
@@ -85,17 +87,20 @@ def googleOcrParsing(response):
                     ocrData.append({"location": location, "text": word_text})
                     #print(location + '\t'+ word_text)
 
-
     #y축 다음 x축 기준으로 소팅
     ocrData = sortLocX(sortLocY(ocrData))
 
     #text에 관한 전처리
     ocrPreProcessData = []
-    #f = open("C:\\Users\\Taiho\\Desktop\\merage\\git\\input.txt", 'w')
-    #for i in range(len(ocrData)):
-    #    f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
-    #f.close()
     idx = 0
+    labelTexts = ["사업자번호","납품장소","운반차번호","출발","납품용적","누계","콘크리트의종류에","따른구분","굵은골재의최대"
+                  ,"치수에따른구분","호칭강도","슬럼프또는","슬럼프플로","시멘트종류에"]
+    '''
+    f = open("C:\\Users\\Taiho\\Desktop\\merage\\git\\input.txt", 'w')
+    for i in range(len(ocrData)):
+        f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
+    f.close()
+    '''
     while idx < len(ocrData):
 
         # text가 "|" 일 경우 text를 삭제한다
@@ -103,25 +108,27 @@ def googleOcrParsing(response):
             del ocrData[idx]
             idx -= 1
         else:
-        # 같은 라인에 거리가 가까운 text는 합친다
-            isCombiend, combineData = distanceParams(ocrData[idx], mostCloseWordSameLine(ocrData[idx], extractSameLine(ocrData[idx], ocrData)))
-            if isCombiend < 10:
-                result = combiendText(ocrData[idx], combineData)
-                ocrData[idx] = result
-                ocrData = removeCombiend(ocrData, combineData)
-                idx -= 2
-        # 같은 줄에 다음 text와 합쳐서 레이블의 부분일 경우 합친다
+            # 같은 라인에 거리가 가까운 text는 합친다
+            isCombiend, combineData = distanceParams(ocrData[idx], mostCloseWordSameLine(ocrData[idx], extractSameLine(ocrData[idx], ocrData)))         
+            if combineData:
+                if isCombiend < 10:
+                    ocrData, idx = combiendText(ocrData, combineData, idx)
 
-        # 같은 줄에 다음 text가 숫자 다음 '시' 숫자 '분'  경우 합친다.
+                # 같은 줄에 다음 text와 합쳐서 레이블의 부분일 경우 합친다
+                ocrData, idx = convertLabelText(ocrData, combineData, labelTexts, idx)
 
+                # 같은 줄에 다음 text가 숫자 다음 '시' 숫자 '분'  경우 합친다.
+                ocrData, idx = convertTimeText(ocrData, combineData, idx)
 
         idx += 1
 
     ocrPreProcessData = ocrData
-    #f = open("C:\\Users\\Taiho\\Desktop\\merage\\local\\input.txt", 'w')
-    #for i in range(len(ocrData)):
-    #    f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
-    #f.close()
+    '''
+    f = open("C:\\Users\\Taiho\\Desktop\\merage\\local\\input.txt", 'w')
+    for i in range(len(ocrData)):
+        f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
+    f.close()
+    '''
     return ocrPreProcessData
 
 # ocr 데이터 위치 정렬 (y축 and x축)
@@ -164,8 +171,7 @@ def extractSameLine(tempdict, temparr):
     for temp in temparr:
         if temp["text"] != "" and tempdict["location"] != temp["location"] and int(tempdictLoc[1]) == int(temp["location"].split(',')[1]):
             dictArr.append(temp)
-    if tempdict["text"] == "운반":
-        print(dictArr)
+
     return dictArr
 
 #temparr에서 tempdict와 가장 가까운 원소를 찾는다
@@ -200,43 +206,75 @@ def distanceParams(tempdict, comparedict):
     return retInt, comparedict
 
 # 좌표 및 텍스트 합친다
-def combiendText(ocrData, combiendData):
+def combiendText(ocrData, combiendData, idx):
     result = {}
-    ocrDataLoc = ocrData["location"].split(',')
+    ocrItem = ocrData[idx]
+    ocrItemLoc = ocrItem["location"].split(',')
     combiendDataLoc = combiendData["location"].split(',')
     location = ""
     text = ""
 
-    if int(ocrDataLoc[0]) < int(combiendDataLoc[0]):
-        location = ocrDataLoc[0] + "," + ocrDataLoc[1] + ","
-        location += str(int(combiendDataLoc[0]) - int(ocrDataLoc[0]) + int(combiendDataLoc[2])) + ","
-        text = ocrData["text"] + combiendData["text"]
+    if int(ocrItemLoc[0]) < int(combiendDataLoc[0]):
+        location = ocrItemLoc[0] + "," + ocrItemLoc[1] + ","
+        location += str(int(combiendDataLoc[0]) - int(ocrItemLoc[0]) + int(combiendDataLoc[2])) + ","
+        text = ocrItem["text"] + combiendData["text"]
     else:
         location = combiendDataLoc[0] + "," + combiendDataLoc[1] + ","
-        location += str(int(ocrDataLoc[0]) - int(combiendDataLoc[0]) + int(ocrDataLoc[2])) + ","
-        text = combiendData["text"] + ocrData["text"]
-    if int(ocrDataLoc[3]) < int(combiendDataLoc[3]):
+        location += str(int(ocrItemLoc[0]) - int(combiendDataLoc[0]) + int(ocrItemLoc[2])) + ","
+        text = combiendData["text"] + ocrItem["text"]
+    if int(ocrItemLoc[3]) < int(combiendDataLoc[3]):
         location += combiendDataLoc[3]
     else:
-        location += ocrDataLoc[3]
+        location += ocrItemLoc[3]
 
-    result["location"] = location
-    result["text"] = text
-    return result;
+    ocrData[idx]["location"] = location
+    ocrData[idx]["text"] = text
 
-# 합쳐진 row는 삭제한다
-def removeCombiend(ocrData, data):
+    # 합쳐진 row 제거
     for i in range(len(ocrData)):
-        if data["location"] == ocrData[i]["location"] and data["text"] == ocrData[i]["text"]:
+        if combiendData["location"] == ocrData[i]["location"] and combiendData["text"] == ocrData[i]["text"]:
             del ocrData[i]
+            idx -= 1
             break
 
-    return ocrData;
+    return ocrData, idx
 
-def getTimeText(ocrData):
+# 같은 줄에 현재 text와 다음 텍스트가 레이블 문자에 포함하면 합친다.
+def convertLabelText(ocrData, combineData, labelTexts, idx):
+    targetLabelTexts = []
 
+    compareText = (ocrData[idx]["text"] + combineData["text"]).replace(" ", "")
+    for i in range(len(labelTexts)):
+        if labelTexts[i].find(compareText) != -1:
+            targetLabelTexts.append(labelTexts[i])
 
-    return ocrData
+        if len(targetLabelTexts) != 0:
+            compareText = (ocrData[idx]["text"] + combineData["text"]).replace(" ", "")
+            j = 0
+            while j < len(targetLabelTexts):
+                if targetLabelTexts[j].find(compareText) != -1:
+                    ocrData, idx = combiendText(ocrData, combineData, idx)
+                else:
+                    del targetLabelTexts[j]
+                    j -= 1
+                j += 1
+
+    return ocrData, idx
+
+# 같은 줄에 현재 text가 숫자 다음 '시' 숫자 '분' 경우 합친다.
+def convertTimeText(ocrData, combineData, idx):
+    caseOne = regMatch('\d{1,2}시{1}', ocrData[idx]["text"].replace(" ", "")) and regMatch('\d{1,2}분{1}', combineData["text"].replace(" ", ""))
+    caseTwo = regMatch('\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('시', combineData["text"].replace(" ", ""))
+    caseThree = regMatch('\d{1,2}시', ocrData[idx]["text"].replace(" ", "")) and regMatch('\d{1,2}', combineData["text"].replace(" ", ""))
+    casFour = regMatch('\d{1,2}시\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('분', combineData["text"].replace(" ", ""))
+
+    if caseOne or caseTwo or caseThree or casFour:
+        ocrData, idx = combiendText(ocrData, combineData, idx)
+
+    return ocrData, idx
+
+def regMatch(reg, text):
+    return re.compile(reg).match(text)
 
 def angle_rotation(filename):
     # 기울기 보정
