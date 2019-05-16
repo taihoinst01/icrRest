@@ -91,10 +91,10 @@ def googleOcrParsing(response):
 
     #text에 관한 전처리
     ocrPreProcessData = []
-    f = open("C:\\Users\\Taiho\\Desktop\\merage\\git\\input.txt", 'w')
-    for i in range(len(ocrData)):
-        f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
-    f.close()
+    #f = open("C:\\Users\\Taiho\\Desktop\\merage\\git\\input.txt", 'w')
+    #for i in range(len(ocrData)):
+    #    f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
+    #f.close()
     idx = 0
     while idx < len(ocrData):
 
@@ -105,19 +105,23 @@ def googleOcrParsing(response):
         else:
         # 같은 라인에 거리가 가까운 text는 합친다
             isCombiend, combineData = distanceParams(ocrData[idx], mostCloseWordSameLine(ocrData[idx], extractSameLine(ocrData[idx], ocrData)))
-            if isCombiend < 50:
+            if isCombiend < 10:
                 result = combiendText(ocrData[idx], combineData)
                 ocrData[idx] = result
                 ocrData = removeCombiend(ocrData, combineData)
                 idx -= 2
-        idx += 1
         # 같은 줄에 다음 text와 합쳐서 레이블의 부분일 경우 합친다
 
         # 같은 줄에 다음 text가 숫자 다음 '시' 숫자 '분'  경우 합친다.
-    f = open("C:\\Users\\Taiho\\Desktop\\merage\\local\\input.txt", 'w')
-    for i in range(len(ocrData)):
-        f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
-    f.close()
+
+
+        idx += 1
+
+    ocrPreProcessData = ocrData
+    #f = open("C:\\Users\\Taiho\\Desktop\\merage\\local\\input.txt", 'w')
+    #for i in range(len(ocrData)):
+    #    f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
+    #f.close()
     return ocrPreProcessData
 
 # ocr 데이터 위치 정렬 (y축 and x축)
@@ -163,6 +167,7 @@ def extractSameLine(tempdict, temparr):
     if tempdict["text"] == "운반":
         print(dictArr)
     return dictArr
+
 #temparr에서 tempdict와 가장 가까운 원소를 찾는다
 def mostCloseWordSameLine(tempdict, temparr):
     retDict = {}
@@ -219,6 +224,7 @@ def combiendText(ocrData, combiendData):
     result["text"] = text
     return result;
 
+# 합쳐진 row는 삭제한다
 def removeCombiend(ocrData, data):
     for i in range(len(ocrData)):
         if data["location"] == ocrData[i]["location"] and data["text"] == ocrData[i]["text"]:
@@ -226,6 +232,11 @@ def removeCombiend(ocrData, data):
             break
 
     return ocrData;
+
+def getTimeText(ocrData):
+
+
+    return ocrData
 
 def angle_rotation(filename):
     # 기울기 보정
