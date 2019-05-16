@@ -202,7 +202,7 @@ def mostCloseWordSameLine(tempdict, temparr):
     try:
         retDict = {}
         tempdictLoc = tempdict["location"].split(',')
-        min = 10000
+        min = 3000
         if len(temparr) != 0:
             for temp in temparr:
                 tempLoc = temp["location"].split(',')
@@ -230,7 +230,7 @@ def distanceParams(tempdict, comparedict):
             dy = abs(int(tempdictLoc[1]) - int(comparedictLoc[1]))
             retInt = math.sqrt( math.pow(dx, 2) + math.pow(dy, 2) )
         else:
-            retInt = 5000
+            retInt = 3000
 
         return retInt, comparedict
 
