@@ -302,7 +302,7 @@ def combiendLabelText(ocrData, combineData, labelTexts, idx):
 
     except Exception as e:
         raise Exception(str(
-            {'code': 500, 'message': 'convertLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
+            {'code': 500, 'message': 'combiendLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text가 숫자 다음 '시' 숫자 '분' 경우 합친다.
 def combiendTimeText(ocrData, combineData, idx):
@@ -319,7 +319,7 @@ def combiendTimeText(ocrData, combineData, idx):
 
     except Exception as e:
         raise Exception(str(
-            {'code': 500, 'message': 'convertTimeText fail', 'error': str(e).replace("'", "").replace('"', '')}))
+            {'code': 500, 'message': 'combiendTimeText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 def regMatch(reg, text):
     try:
