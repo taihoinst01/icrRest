@@ -70,8 +70,9 @@ def ocrReq(filefolder,file_list):
 
 
 def googleOcrParsing(response):
-    originX = response.text_annotations[0].bounding_poly.vertices[0].x
-    originY = response.text_annotations[0].bounding_poly.vertices[0].y
+    #originX = response.text_annotations[0].bounding_poly.vertices[0].x
+    #originY = response.text_annotations[0].bounding_poly.vertices[0].y
+    originX, originY = 0, 0
 
     try:
         ocrData = []
