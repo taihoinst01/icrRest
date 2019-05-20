@@ -11,6 +11,7 @@ from pdf2image import convert_from_path, convert_from_bytes
 from google.cloud import vision
 import io
 import re
+import json
 #지워야할 수평 선의 두께
 deleteHorizontalLineWeight = 2
 #지워야할 수직 선의 두께
@@ -102,9 +103,10 @@ def googleOcrParsing(response):
         #text에 관한 전처리
         ocrPreProcessData = []
         idx = 0
-        # 임시
-        labelTexts = ["사업자번호","납품장소","운반차번호","출발","납품용적","누계","콘크리트의종류에","따른구분","굵은골재의최대"
-                      ,"치수에따른구분","호칭강도","슬럼프또는","슬럼프플로","시멘트종류에"]
+        # 임시/
+        labels = json.loads(open("labels.json").read())
+        labelTexts = labels[0]["lableName"]
+
         '''
         f = open("C:\\Users\\Taiho\\Desktop\\merage\\git\\input.txt", 'w')
         for i in range(len(ocrData)):
