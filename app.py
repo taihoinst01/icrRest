@@ -342,7 +342,7 @@ def fileUploadTest():
     # f.save(secure_filename(convertFilename))
     # f.save(os.path.join(upload_path, convertFilename))
 
-    convertFilename = 'chg_E79223B9X111737_05102019_131338_000084-0.jpg'
+    convertFilename = 'E79223B9X111737_05172019_121648_000163.pdf'
     ext = os.path.splitext(convertFilename)[1]
 
     if ext == ".pdf":
@@ -412,7 +412,7 @@ def pyOcr(item):
     obj["docCategory"] = {"DOCTYPE": docType, "DOCTOPTYPE": docTopType, "DOCSCORE": maxNum}
     obj["data"] = ocrData
 
-    print("-------------result---------------")
+    print("========================================result=================================================")
     for item in obj['data']:
         print(item)
 
@@ -455,7 +455,7 @@ def getOcrInfo(item):
                     # print('Word text: {}, location:{},{},{},{}'.format(word_text, x, y, width, height))
                     # print('Word text: {}, location:{}'.format(word_text, word.bounding_box.vertices))
 
-    print('--------------------origin---------------------')
+    print('==========================================origin=============================================')
     for data in ocrData:
         print(data)
 
@@ -503,7 +503,7 @@ def getOcrInfo(item):
         f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
     f.close()
     '''
-    print('--------------------ocrPreProcessData---------------------')
+    print('========================================ocrPreProcessData======================================')
     for data in ocrPreProcessData:
         print(data)
     return ocrPreProcessData
