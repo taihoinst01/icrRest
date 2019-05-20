@@ -57,11 +57,11 @@ def ocrReq(filefolder,file_list):
             ocrData = googleOcrParsing(response)
             #print(str(ocrData).replace("'", '"'))
             if str(type(ocrData)) == "<class 'list'>":
-                '''
+                
                 f = open("C:\\Users\\Taiho\\Desktop\\input.txt", 'w')
                 f.write(str(ocrData).replace("'", '"'))
                 f.close()
-                '''
+                
             else:
                 print(ocrData)
             break
@@ -70,6 +70,10 @@ def ocrReq(filefolder,file_list):
 
 
 def googleOcrParsing(response):
+    #originX = response.text_annotations[0].bounding_poly.vertices[0].x
+    #originY = response.text_annotations[0].bounding_poly.vertices[0].y
+    originX, originY = 0, 0
+
     try:
         ocrData = []
         for page in response.full_text_annotation.pages:
@@ -117,13 +121,13 @@ def googleOcrParsing(response):
                 isCombiend, combineData = distanceParams(ocrData[idx], mostCloseWordSameLine(ocrData[idx], extractSameLine(ocrData[idx], ocrData)))         
                 if combineData:
                     if isCombiend < 10:
-                        ocrData, idx = combiendText(ocrData, combineData, idx)
+                        ocrData, idx = combiendText(ocrData, combineData, idx, originX, originY)
 
                     # 같은 줄에 다음 text와 합쳐서 레이블의 부분일 경우 합친다
-                    ocrData, idx = combiendLabelText(ocrData, combineData, labelTexts, idx)
+                    ocrData, idx = combiendLabelText(ocrData, combineData, labelTexts, idx, originX, originY)
 
                     # 같은 줄에 다음 text가 숫자 다음 '시' 숫자 '분'  경우 합친다.
-                    ocrData, idx = combiendTimeText(ocrData, combineData, idx)
+                    ocrData, idx = combiendTimeText(ocrData, combineData, idx,  originX, originY)
             idx += 1
 
         ocrPreProcessData = ocrData
@@ -202,7 +206,7 @@ def mostCloseWordSameLine(tempdict, temparr):
     try:
         retDict = {}
         tempdictLoc = tempdict["location"].split(',')
-        min = 10000
+        min = 3000
         if len(temparr) != 0:
             for temp in temparr:
                 tempLoc = temp["location"].split(',')
@@ -230,7 +234,7 @@ def distanceParams(tempdict, comparedict):
             dy = abs(int(tempdictLoc[1]) - int(comparedictLoc[1]))
             retInt = math.sqrt( math.pow(dx, 2) + math.pow(dy, 2) )
         else:
-            retInt = 5000
+            retInt = 3000
 
         return retInt, comparedict
 
@@ -239,7 +243,7 @@ def distanceParams(tempdict, comparedict):
             {'code': 500, 'message': 'distanceParams fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 좌표 및 텍스트 합친다
-def combiendText(ocrData, combiendData, idx):
+def combiendText(ocrData, combiendData, idx, originX, originY):
     try:
         result = {}
         ocrItem = ocrData[idx]
@@ -249,11 +253,11 @@ def combiendText(ocrData, combiendData, idx):
         text = ""
 
         if int(ocrItemLoc[0]) < int(combiendDataLoc[0]):
-            location = ocrItemLoc[0] + "," + ocrItemLoc[1] + ","
+            location = str(int(ocrItemLoc[0]) - int(originX)) + "," + str(int(ocrItemLoc[1]) - int(originY)) + ","
             location += str(int(combiendDataLoc[0]) - int(ocrItemLoc[0]) + int(combiendDataLoc[2])) + ","
             text = ocrItem["text"] + combiendData["text"]
         else:
-            location = combiendDataLoc[0] + "," + combiendDataLoc[1] + ","
+            location = str(int(combiendDataLoc[0]) - int(originX)) + "," + str(int(combiendDataLoc[1]) - int(originY)) + ","
             location += str(int(ocrItemLoc[0]) - int(combiendDataLoc[0]) + int(ocrItemLoc[2])) + ","
             text = combiendData["text"] + ocrItem["text"]
         if int(ocrItemLoc[3]) < int(combiendDataLoc[3]):
@@ -278,7 +282,7 @@ def combiendText(ocrData, combiendData, idx):
             {'code': 500, 'message': 'combiendText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text와 다음 텍스트가 레이블 문자에 포함하면 합친다.
-def combiendLabelText(ocrData, combineData, labelTexts, idx):
+def combiendLabelText(ocrData, combineData, labelTexts, idx, originX, originY):
     try:
         targetLabelTexts = []
 
@@ -292,7 +296,7 @@ def combiendLabelText(ocrData, combineData, labelTexts, idx):
                 j = 0
                 while j < len(targetLabelTexts):
                     if targetLabelTexts[j].find(compareText) != -1:
-                        ocrData, idx = combiendText(ocrData, combineData, idx)
+                        ocrData, idx = combiendText(ocrData, combineData, idx, originX, originY)
                     else:
                         del targetLabelTexts[j]
                         j -= 1
@@ -302,10 +306,10 @@ def combiendLabelText(ocrData, combineData, labelTexts, idx):
 
     except Exception as e:
         raise Exception(str(
-            {'code': 500, 'message': 'convertLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
+            {'code': 500, 'message': 'combiendLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text가 숫자 다음 '시' 숫자 '분' 경우 합친다.
-def combiendTimeText(ocrData, combineData, idx):
+def combiendTimeText(ocrData, combineData, idx, originX, originY):
     try:
         caseOne = regMatch('\d{1,2}시{1}', ocrData[idx]["text"].replace(" ", "")) and regMatch('\d{1,2}분{1}', combineData["text"].replace(" ", ""))
         caseTwo = regMatch('\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('시', combineData["text"].replace(" ", ""))
@@ -313,13 +317,13 @@ def combiendTimeText(ocrData, combineData, idx):
         casFour = regMatch('\d{1,2}시\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('분', combineData["text"].replace(" ", ""))
 
         if caseOne or caseTwo or caseThree or casFour:
-            ocrData, idx = combiendText(ocrData, combineData, idx)
+            ocrData, idx = combiendText(ocrData, combineData, idx, originX, originY)
 
         return ocrData, idx
 
     except Exception as e:
         raise Exception(str(
-            {'code': 500, 'message': 'convertTimeText fail', 'error': str(e).replace("'", "").replace('"', '')}))
+            {'code': 500, 'message': 'combiendTimeText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 def regMatch(reg, text):
     try:
