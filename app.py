@@ -21,7 +21,7 @@ import labelEval
 import entryTrain
 import entryEval
 import linedel as lineDel
-import lineDetection as lineDect
+#import lineDetection as lineDect
 from PIL import Image
 import io
 from google.cloud import vision
@@ -342,12 +342,11 @@ def fileUploadTest():
     # f.save(secure_filename(convertFilename))
     # f.save(os.path.join(upload_path, convertFilename))
 
-    convertFilename = 'chg_E79223B9X111737_05102019_131338_000084-0.jpg'
+    convertFilename = 'test.jpg'
     ext = os.path.splitext(convertFilename)[1]
 
     if ext == ".pdf":
         fileNames = convertPdfToImage(upload_path, convertFilename)
-        print(fileNames)
         for item in fileNames:
             imgResize(upload_path + item)
             # lineDect.main(stringToBase64(upload_path + item))
@@ -356,6 +355,7 @@ def fileUploadTest():
             retResult.append(obj)
     else:
         fileNames = imgResize(upload_path + convertFilename)
+        #fileNames = ["C:/ICR/test.jpg"]
         for item in fileNames:
             obj = pyOcr(item)
         retResult.append(obj)
@@ -412,11 +412,10 @@ def pyOcr(item):
     obj["docCategory"] = {"DOCTYPE": docType, "DOCTOPTYPE": docTopType, "DOCSCORE": maxNum}
     obj["data"] = ocrData
 
-    print("-------------result---------------")
-    for item in obj['data']:
-        print(item)
+    #print("-------------result---------------")
+    #for item in obj["data"]:
+    #    print(item)
 
-    print(obj)
     return obj
 
 def getOcrInfo(item):
@@ -449,15 +448,15 @@ def getOcrInfo(item):
                     height = int(word.bounding_box.vertices[3].y) - int(word.bounding_box.vertices[0].y)
 
                     location = str(x) + ',' + str(y) + ',' + str(width) + ',' + str(height)
-                    if x > 0:
+                    if x > 0 and y > 0:
                         ocrData.append({"location": location, "text":word_text})
 
                     # print('Word text: {}, location:{},{},{},{}'.format(word_text, x, y, width, height))
                     # print('Word text: {}, location:{}'.format(word_text, word.bounding_box.vertices))
 
-    print('--------------------origin---------------------')
-    for data in ocrData:
-        print(data)
+    #print('--------------------origin---------------------')
+    #for data in ocrData:
+    #    print(data)
 
     # y축 다음 x축 기준으로 소팅
     ocrData = sortLocX(sortLocY(ocrData))
@@ -468,12 +467,8 @@ def getOcrInfo(item):
     # 임시
     labelTexts = ["사업자번호", "납품장소", "운반차번호", "출발", "납품용적", "누계", "콘크리트의종류에", "따른구분", "굵은골재의최대"
         , "치수에따른구분", "호칭강도", "슬럼프또는", "슬럼프플로", "시멘트종류에"]
-    '''
-    f = open("C:\\Users\\Taiho\\Desktop\\merage\\git\\input.txt", 'w')
-    for i in range(len(ocrData)):
-        f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
-    f.close()
-    '''
+    originX, originY = 0, 0
+
     while idx < len(ocrData):
         # text가 "|" 일 경우 text를 삭제한다
         if ocrData[idx]["text"] == '|':
@@ -481,31 +476,23 @@ def getOcrInfo(item):
             idx -= 1
         else:
             # 같은 라인에 거리가 가까운 text는 합친다
-            isCombiend, combineData = distanceParams(ocrData[idx], mostCloseWordSameLine(ocrData[idx],
-                                                                                         extractSameLine(
-                                                                                             ocrData[idx],
-                                                                                             ocrData)))
+            isCombiend, combineData = distanceParams(ocrData[idx], mostCloseWordSameLine(ocrData[idx], extractSameLine(ocrData[idx], ocrData, 3)))         
             if combineData:
-                if isCombiend < 10:
-                    ocrData, idx = combiendText(ocrData, combineData, idx)
+                if isCombiend < 21:
+                    ocrData, idx = combiendText(ocrData, combineData, idx, originX, originY)
 
                 # 같은 줄에 다음 text와 합쳐서 레이블의 부분일 경우 합친다
-                ocrData, idx = combiendLabelText(ocrData, combineData, labelTexts, idx)
+                ocrData, idx = combiendLabelText(ocrData, combineData, labelTexts, idx, originX, originY)
 
                 # 같은 줄에 다음 text가 숫자 다음 '시' 숫자 '분'  경우 합친다.
-                ocrData, idx = combiendTimeText(ocrData, combineData, idx)
+                ocrData, idx = combiendTimeText(ocrData, combineData, idx,  originX, originY)
         idx += 1
 
     ocrPreProcessData = ocrData
-    '''
-    f = open("C:\\Users\\Taiho\\Desktop\\merage\\local\\input.txt", 'w')
-    for i in range(len(ocrData)):
-        f.write("\""+ocrData[i]["location"]+ "\" \"" + ocrData[i]["text"] + '\" \n')
-    f.close()
-    '''
-    print('--------------------ocrPreProcessData---------------------')
-    for data in ocrPreProcessData:
-        print(data)
+
+    #print('--------------------ocrPreProcessData---------------------')
+    #for data in ocrPreProcessData:
+    #    print(data)
     return ocrPreProcessData
 
 # ocr 데이터 위치 정렬 (y축 and x축)
@@ -551,13 +538,13 @@ def sortLocX(data):
             {'code': 500, 'message': 'sortLocX fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 #temparr에서 tempdict와 같은 라인에 있는 원소를 찾는다
-def extractSameLine(tempdict, temparr):
+def extractSameLine(tempdict, temparr, yInterval):
     try:
         dictArr = []
         tempdictLoc = tempdict["location"].split(',')
 
         for temp in temparr:
-            if temp["text"] != "" and tempdict["location"] != temp["location"] and int(tempdictLoc[1]) == int(temp["location"].split(',')[1]):
+            if temp["text"] != "" and tempdict["location"] != temp["location"] and int(tempdictLoc[1]) >= int(temp["location"].split(',')[1]) - yInterval and int(tempdictLoc[1]) <= int(temp["location"].split(',')[1]) + yInterval:
                 dictArr.append(temp)
 
         return dictArr
@@ -571,7 +558,7 @@ def mostCloseWordSameLine(tempdict, temparr):
     try:
         retDict = {}
         tempdictLoc = tempdict["location"].split(',')
-        min = 10000
+        min = 3000
         if len(temparr) != 0:
             for temp in temparr:
                 tempLoc = temp["location"].split(',')
@@ -608,7 +595,7 @@ def distanceParams(tempdict, comparedict):
             {'code': 500, 'message': 'distanceParams fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 좌표 및 텍스트 합친다
-def combiendText(ocrData, combiendData, idx):
+def combiendText(ocrData, combiendData, idx, originX, originY):
     try:
         result = {}
         ocrItem = ocrData[idx]
@@ -618,11 +605,11 @@ def combiendText(ocrData, combiendData, idx):
         text = ""
 
         if int(ocrItemLoc[0]) < int(combiendDataLoc[0]):
-            location = ocrItemLoc[0] + "," + ocrItemLoc[1] + ","
+            location = str(int(ocrItemLoc[0]) - int(originX)) + "," + str(int(ocrItemLoc[1]) - int(originY)) + ","
             location += str(int(combiendDataLoc[0]) - int(ocrItemLoc[0]) + int(combiendDataLoc[2])) + ","
             text = ocrItem["text"] + combiendData["text"]
         else:
-            location = combiendDataLoc[0] + "," + combiendDataLoc[1] + ","
+            location = str(int(combiendDataLoc[0]) - int(originX)) + "," + str(int(combiendDataLoc[1]) - int(originY)) + ","
             location += str(int(ocrItemLoc[0]) - int(combiendDataLoc[0]) + int(ocrItemLoc[2])) + ","
             text = combiendData["text"] + ocrItem["text"]
         if int(ocrItemLoc[3]) < int(combiendDataLoc[3]):
@@ -647,7 +634,7 @@ def combiendText(ocrData, combiendData, idx):
             {'code': 500, 'message': 'combiendText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text와 다음 텍스트가 레이블 문자에 포함하면 합친다.
-def combiendLabelText(ocrData, combineData, labelTexts, idx):
+def combiendLabelText(ocrData, combineData, labelTexts, idx, originX, originY):
     try:
         targetLabelTexts = []
 
@@ -661,7 +648,7 @@ def combiendLabelText(ocrData, combineData, labelTexts, idx):
                 j = 0
                 while j < len(targetLabelTexts):
                     if targetLabelTexts[j].find(compareText) != -1:
-                        ocrData, idx = combiendText(ocrData, combineData, idx)
+                        ocrData, idx = combiendText(ocrData, combineData, idx, originX, originY)
                     else:
                         del targetLabelTexts[j]
                         j -= 1
@@ -671,10 +658,10 @@ def combiendLabelText(ocrData, combineData, labelTexts, idx):
 
     except Exception as e:
         raise Exception(str(
-            {'code': 500, 'message': 'convertLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
+            {'code': 500, 'message': 'combiendLabelText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 # 같은 줄에 현재 text가 숫자 다음 '시' 숫자 '분' 경우 합친다.
-def combiendTimeText(ocrData, combineData, idx):
+def combiendTimeText(ocrData, combineData, idx, originX, originY):
     try:
         caseOne = regMatch('\d{1,2}시{1}', ocrData[idx]["text"].replace(" ", "")) and regMatch('\d{1,2}분{1}', combineData["text"].replace(" ", ""))
         caseTwo = regMatch('\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('시', combineData["text"].replace(" ", ""))
@@ -682,13 +669,13 @@ def combiendTimeText(ocrData, combineData, idx):
         casFour = regMatch('\d{1,2}시\d{1,2}', ocrData[idx]["text"].replace(" ", "")) and regMatch('분', combineData["text"].replace(" ", ""))
 
         if caseOne or caseTwo or caseThree or casFour:
-            ocrData, idx = combiendText(ocrData, combineData, idx)
+            ocrData, idx = combiendText(ocrData, combineData, idx, originX, originY)
 
         return ocrData, idx
 
     except Exception as e:
         raise Exception(str(
-            {'code': 500, 'message': 'convertTimeText fail', 'error': str(e).replace("'", "").replace('"', '')}))
+            {'code': 500, 'message': 'combiendTimeText fail', 'error': str(e).replace("'", "").replace('"', '')}))
 
 def regMatch(reg, text):
     try:
@@ -727,6 +714,7 @@ def evaluateEntry(ocrData):
         colNum = [765,766]
         labelDatas = []
         ocrDataX = sortArrLocationX(ocrData)
+
         f = open(projectFolder + '/labelTrain/data/invoice.train', 'r', encoding='utf-8')
         lines = f.readlines()
 
@@ -785,14 +773,16 @@ def evaluateEntry(ocrData):
         print(e)
 
 def evaluateLabelMulti(ocrData):
+
     try:
         labelDatas = []
         delDatas = []
         # ocrData = json.loads('[{"location": "1289,1409,195,38", "text": "슬럼프또는"},{"location": "382,1410,336,54", "text": "콘크리트의종류에"},{"location": "718,1410,168,54", "text": "굵은골재"},{"location": "886,1410,126,54", "text": "의최대"},{"location": "1075,1410,148,39", "text": "호칭강도"},{"location": "1617,1426,231,39", "text": "시멘트 종류에"},{"location": "1289,1455,194,38", "text": "슬럼프 플로"},{"location": "740,1457,280,38", "text": "치수에따른구분"},{"location": "1649,1489,170,38", "text": "따른 구분"},{"location": "440,1493,191,38", "text": "따른 구분"}]')
         ocrDataX = sortArrLocationX(ocrData)
+
         f = open(projectFolder + '/labelTrain/data/invoice.train', 'r', encoding='utf-8')
         lines = f.readlines()
-
+        
         # for item in ocrData:
         #     print(item)
 
@@ -842,7 +832,7 @@ def evaluateLabelMulti(ocrData):
             text = data['text'].replace(' ', '')
             dataLoc = data['location'].split(',')
             check = False
-            print('00000000', data, '0000000')
+            #print('00000000', data, '0000000')
             for labelData in labelDatas:
                 insertDatas = []
                 if labelData[0].lower().find(text.lower()) == 0:
@@ -858,14 +848,14 @@ def evaluateLabelMulti(ocrData):
                 tempStr = text
 
                 for i in range(10):
-                    print(i, ',', labelData[0])
+                    #print(i, ',', labelData[0])
                     for insertData in insertDatas:
                         str = tempStr + insertData['text'].replace(' ', '')
                         if labelData[0].lower().find(str.lower()) == 0:
                             tempStr = tempStr + insertData['text'].replace(' ', '')
                             delDatas.append(insertData)
 
-                        print(insertData['text'], ',', str)
+                        #print(insertData['text'], ',', str)
 
                         if labelData[0].lower() == tempStr.lower():
                             data['colLbl'] = labelData[1]
@@ -898,6 +888,7 @@ def uniq(ocrData):
 def sortArrLocationX(inputArr):
     tempArr = []
     retArr = []
+
     for item in inputArr:
         tempArr.append((makeindexX(item['location']), item))
     tempArr.sort(key=operator.itemgetter(0))
@@ -911,6 +902,7 @@ def makeindexX(location):
         for i in range(0, 5):
             if (len(temparr[1]) < 5):
                 temparr[1] = '0' + temparr[1]
+
         return int(temparr[0] + temparr[1])
     else:
         return 999999999999
