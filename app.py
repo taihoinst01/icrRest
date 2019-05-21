@@ -21,7 +21,7 @@ import labelEval
 import entryTrain
 import entryEval
 import linedel as lineDel
-#import lineDetection as lineDect
+import lineDetection as lineDect
 from PIL import Image
 import io
 from google.cloud import vision
@@ -342,22 +342,25 @@ def fileUploadTest():
     # f.save(secure_filename(convertFilename))
     # f.save(os.path.join(upload_path, convertFilename))
 
-    convertFilename = 'E79223B9X111737_05172019_121922_000164.pdf'
+    convertFilename = 'E79223B9X111737_05172019_122151_000166.pdf'
     ext = os.path.splitext(convertFilename)[1]
 
     if ext == ".pdf":
         fileNames = convertPdfToImage(upload_path, convertFilename)
         for item in fileNames:
+            lineDect.main(stringToBase64(upload_path + item))
             imgResize(upload_path + item)
-            # lineDect.main(stringToBase64(upload_path + item))
-            lineDel.main(stringToBase64(upload_path  + item))
             obj = pyOcr(upload_path + item)
             retResult.append(obj)
     else:
         fileNames = imgResize(upload_path + convertFilename)
         #fileNames = ["C:/ICR/test.jpg"]
         for item in fileNames:
-            obj = pyOcr(item)
+            # lineDetectionAndCrop
+            x, y, w, h = lineDect.main(stringToBase64(upload_path + "chg_" + item))
+            # lineDeleteAndNoiseDelete
+            lineDel.main(stringToBase64(upload_path + "chg_" + item))
+            obj = pyOcr(upload_path + "chg_" + item, convertFilename, x, y, w, h)
         retResult.append(obj)
 
     result = re.sub('None', "null", json.dumps(retResult, ensure_ascii=False))
