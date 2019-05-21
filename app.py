@@ -342,7 +342,7 @@ def fileUploadTest():
     # f.save(secure_filename(convertFilename))
     # f.save(os.path.join(upload_path, convertFilename))
 
-    convertFilename = 'E79223B9X111737_05172019_121648_000163.pdf'
+    convertFilename = 'E79223B9X111737_05172019_121922_000164.pdf'
     ext = os.path.splitext(convertFilename)[1]
 
     if ext == ".pdf":
@@ -437,22 +437,76 @@ def getOcrInfo(item):
                 # print('Paragraph confidence: {}'.format(paragraph.confidence))
 
                 for word in paragraph.words:
-                    word_text = ''.join([
-                        symbol.text for symbol in word.symbols
-                    ])
-
-                    x = word.bounding_box.vertices[0].x
-                    y = word.bounding_box.vertices[0].y
-
-                    width = int(word.bounding_box.vertices[1].x) - int(word.bounding_box.vertices[0].x)
-                    height = int(word.bounding_box.vertices[3].y) - int(word.bounding_box.vertices[0].y)
-
-                    location = str(x) + ',' + str(y) + ',' + str(width) + ',' + str(height)
-                    if x > 0 and y > 0:
-                        ocrData.append({"location": location, "text":word_text})
+                    # word_text = ''.join([
+                    #     symbol.text for symbol in word.symbols
+                    # ])
+                    #
+                    # x = word.bounding_box.vertices[0].x
+                    # y = word.bounding_box.vertices[0].y
+                    #
+                    # width = int(word.bounding_box.vertices[1].x) - int(word.bounding_box.vertices[0].x)
+                    # height = int(word.bounding_box.vertices[3].y) - int(word.bounding_box.vertices[0].y)
+                    #
+                    # location = str(x) + ',' + str(y) + ',' + str(width) + ',' + str(height)
+                    # if x > 0 and y > 0:
+                    #     ocrData.append({"location": location, "text":word_text})
 
                     # print('Word text: {}, location:{},{},{},{}'.format(word_text, x, y, width, height))
                     # print('Word text: {}, location:{}'.format(word_text, word.bounding_box.vertices))
+
+                    # y축 40 이상 차이 시 텍스트 분리
+                    word_text = ''
+                    preY = 0
+                    resLists = []
+                    for idx in range(len(word.symbols)):
+                        x = word.symbols[idx].bounding_box.vertices[0].x
+                        y = word.symbols[idx].bounding_box.vertices[0].y
+
+                        if idx != 0:
+                            preY = word.symbols[idx - 1].bounding_box.vertices[0].y
+                            diffHeight = preY - y
+
+                            if diffHeight > -40:
+                                resLists.append(word.symbols[idx])
+                            else:
+                                for rIdx in range(len(resLists)):
+                                    word_text += resLists[rIdx].text
+                                    if rIdx == 0:
+                                        x = resLists[rIdx].bounding_box.vertices[0].x
+                                        y = resLists[rIdx].bounding_box.vertices[0].y
+
+                                    if rIdx == len(resLists) - 1:
+                                        width = int(resLists[rIdx].bounding_box.vertices[1].x) - int(x)
+                                        height = int(resLists[rIdx].bounding_box.vertices[3].y) - int(y)
+
+                                # print('Word text: {}, location:{},{},{},{}'.format(word_text, x, y, width, height))
+
+                                location = str(x) + ',' + str(y) + ',' + str(width) + ',' + str(height)
+                                if x > 0 and y > 0:
+                                    ocrData.append({"location": location, "text": word_text})
+
+                                resLists = []
+                                resLists.append(word.symbols[idx])
+                        else:
+                            resLists.append(word.symbols[idx])
+
+                        word_text = ''
+                        if idx == len(word.symbols) - 1:
+                            for rIdx in range(len(resLists)):
+                                word_text += resLists[rIdx].text
+                                if rIdx == 0:
+                                    x = resLists[rIdx].bounding_box.vertices[0].x
+                                    y = resLists[rIdx].bounding_box.vertices[0].y
+
+                                if rIdx == len(resLists) - 1:
+                                    width = int(resLists[rIdx].bounding_box.vertices[1].x) - int(x)
+                                    height = int(resLists[rIdx].bounding_box.vertices[3].y) - int(y)
+
+                            # print('Word text: {}, location:{},{},{},{}'.format(word_text, x, y, width, height))
+
+                            location = str(x) + ',' + str(y) + ',' + str(width) + ',' + str(height)
+                            if x > 0 and y > 0:
+                                ocrData.append({"location": location, "text": word_text})
 
     print('==========================================origin=============================================')
     for data in ocrData:
